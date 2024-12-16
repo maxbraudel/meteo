@@ -1,15 +1,89 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA</title>
+    <title>Test générateur IA</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        #reponse {
+            max-width: 50vw;
+            max-height: 90vh;
+            font-size: 1.2em;
+            color: #333;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-wrap: break-word;
+            overflow-y: auto;
+        }
+    </style>
 </head>
-
 <body>
-    <h1>IA</h1>
-</body>
+    <div id="reponse">...</div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const reponseEl = document.getElementById('reponse');
+
+            try {
+                const reponse = await fetch('https://ollama.maxbraudel.com/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'mistral:latest',
+                        prompt: "Just be kind.",
+                        stream: true
+                    })
+                });
+
+                // Streamer la réponse
+                const reader = reponse.body.getReader();
+                const decoder = new TextDecoder();
+                let reponseComplete = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+                    for (const line of lines) {
+                        try {
+                            const parsedLine = JSON.parse(line);
+                            if (parsedLine.response) {
+                                reponseComplete += parsedLine.response;
+                                reponseEl.innerHTML = reponseComplete;
+                            }
+                        } catch (parseError) {
+                            console.error('Erreur lors du fetch:', parseError);
+                            reponseEl.textContent = "L'API est inacessible, veuillez réessayer plus tard.";
+                        }
+                    }
+                }
+            } catch (erreur) {
+                reponseEl.textContent = "L'API est inacessible, veuillez réessayer plus tard.";
+                console.error('Erreur lors du fetch:', erreur);
+            }
+        });
+    </script>
+</body>
 </html>
