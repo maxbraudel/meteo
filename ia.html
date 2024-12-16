@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test générateur IA</title>
@@ -9,7 +12,6 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden;
         }
         body {
             display: flex;
@@ -18,24 +20,26 @@
             font-family: Arial, sans-serif;
             line-height: 1.6;
             text-align: center;
-            background-color: #f4f4f4;
         }
         #reponse {
+            font-family: "Inter", sans-serif;
+            line-height: 1.2;
+            text-align: justify;
+            text-justify: inter-character;
+            font-style: normal;
             max-width: 50vw;
-            max-height: 90vh;
-            font-size: 1.2em;
+            font-size: 28px;
+            font-weight: 600;
             color: #333;
-            background-color: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             overflow-wrap: break-word;
             overflow-y: auto;
         }
     </style>
 </head>
 <body>
-    <div id="reponse">...</div>
+    <div id="reponse"><span style="font-size: 60px;">...</span></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
