@@ -130,7 +130,7 @@
             z-index: -1;
             top: 50%;
             left: 50%;
-            transform: translate(calc(-50% + 5rem), calc(-50% + 5rem));
+            transform: translate(calc(-50% + 5rem), calc(-50% + 6rem));
         }
 
         .pointeur {
@@ -190,11 +190,18 @@
 
             .titre {
                 font-size: 1.5rem;
-                margin-bottom: 1.5rem;
+                margin-bottom: 1.8rem;
             }
         }
 
+        br {
+            margin-left: 100px;
+        }
+
         
+        .indent {
+            Padding-left:5vw;
+        }
 
     </style>
 </head>
@@ -331,7 +338,7 @@
                     <img class="pointeur no-select" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">
                 `
 
-                const baseContent = `<div class="titre">Quelques idées de parcours à ${inputObject.ville}</div> ${pointeurIconElement}`
+                const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${inputObject.ville}</div>${pointeurIconElement}`
 
                 reponseEl.innerHTML = baseContent
                 reponseBackEl.innerHTML = baseContent
@@ -343,7 +350,11 @@
                     })
                 }, 1)
 
+                let wordsArray = []
+                let shadowWordsArray = []
+
                 while (true) {
+
                     const { done, value } = await reader.read();
                     if (done) {
                         document.querySelector('.pointeur').classList.remove('pointeur-animation');
@@ -367,9 +378,46 @@
 
                                 const newSpan = document.createElement('span');
                                 newSpan.classList.add('word');
-                                newSpan.innerHTML = parsedLine.response;
-
                                 const newShadowSpan = newSpan.cloneNode(true);
+
+                                let newWord = parsedLine.response;
+
+                                newWord.replace(/\*/g, '')
+
+                                // if the new word is a dot and the last word is a number add a br before
+                                if (wordsArray && wordsArray.length > 0 && newWord === '.') {
+
+                                    const lastWordElement = wordsArray[wordsArray.length - 1];
+                                    const lastLastWordElement = wordsArray[wordsArray.length - 2] || null;
+
+                                    const lastShadowWordElement = shadowWordsArray[shadowWordsArray.length - 1];
+
+                                    if (lastWordElement.textContent.match(/^\d/) && (lastLastWordElement === null || !lastLastWordElement.textContent.match(/^\d/))) {
+                                        // add a br before last word element
+                                        const br = document.createElement('br');
+                                        const span = document.createElement('span');
+                                        span.classList.add('indent');
+
+                                        const brShadow = br.cloneNode(true);
+                                        const spanShadow = span.cloneNode(true);
+                                        
+                                        if (wordsArray.length > 2) {
+                                            lastWordElement.parentNode.insertBefore(br, lastWordElement);
+                                            lastShadowWordElement.parentNode.insertBefore(brShadow, lastShadowWordElement);
+                                        }
+                                        lastWordElement.parentNode.insertBefore(span, lastWordElement);
+                                        lastShadowWordElement.parentNode.insertBefore(spanShadow, lastShadowWordElement);
+                                    }
+                                }
+
+                                // add the last word to lastWord array
+                                wordsArray.push(newSpan)
+                                shadowWordsArray.push(newShadowSpan)
+
+                                newSpan.innerHTML = newWord;
+                                newShadowSpan.innerHTML = newWord;
+
+                                
 
                                 reponseEl.insertBefore(newSpan, reponseEl.querySelector('.pointeur'))
                                 reponseBackEl.insertBefore(newShadowSpan, reponseBackEl.querySelector('.pointeur'))
