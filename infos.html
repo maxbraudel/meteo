@@ -23,7 +23,7 @@
             user-select: none;
         }
 
-        section {
+        main {
             margin: 0;
             padding: 0;
             min-height: 100vh;
@@ -128,12 +128,16 @@
             transform: translate(calc(-50% + 90px), calc(-50% + 90px));
         }
 
+        #pointer {
+            width: 1em; height: 1em; vertical-align: middle;
+        }
+
     </style>
 </head>
 <body>
 
     
-    <section>
+    <main>
         <div class="reponse-container">
             <div id="reponse" class="no-select"><div class="loader-stage-1 no-select"></div></div>
         </div>
@@ -143,7 +147,7 @@
                 <div id="reponse-back" class="justify-text"><div class="loader"></div></div>
             </div>
         </div>
-    </section>
+    </main>
         
 
     <script>
@@ -277,7 +281,7 @@
                             if (parsedLine.response) {
                                 // Ajouter chaque nouveau mot à la fin du texte
                                 reponseComplete += parsedLine.response;
-                                const reponseWithIcon = reponseComplete + ' <img id="pointer" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__" style="width: 1em; height: 1em; vertical-align: middle;">';
+                                const reponseWithIcon = reponseComplete + ' <img id="pointer" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">';
                                 reponseEl.innerHTML = reponseWithIcon
                                 reponseBackEl.innerHTML = reponseWithIcon
                             }
