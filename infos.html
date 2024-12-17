@@ -50,7 +50,7 @@
             font-family: "Inter", sans-serif;
             line-height: 1.2;
             font-style: normal;
-            max-width: 50vw;
+            width: 50vw;
             font-size: 1.7rem;
             font-weight: 600;
             color: #333;
@@ -202,6 +202,21 @@
             Padding-left:5vw;
         }
 
+        /* center loader on the page */
+
+        .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .show-loader {
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
@@ -209,12 +224,14 @@
     
     <main>
         <div class="reponse-conteneur">
-            <div id="reponse" class=""><div class="loader-stage-1 no-select"></div></div>
+            <div id="reponse" class=""></div>
         </div>
+
+        <div class="loader no-select"></div>
 
         <div class="ombre-conteneur">
             <div class="reponse-conteneur no-select">
-                <div id="reponse-back" class="justify-text"><div class="loader"></div></div>
+                <div id="reponse-back" class="justify-text"></div>
             </div>
         </div>
     </main>
@@ -222,12 +239,42 @@
 
     <script>
 
+        function showLoader(stage) {
+            const loadingEl = document.querySelector('.loader');
+
+            setTimeout(() => {
+                loadingEl.classList.add('show-loader');
+            }, 1);
+
+            if (stage === 1) {
+                loadingEl.classList.remove('loader-stage-2');
+                loadingEl.classList.add('loader-stage-1');
+            } else if (stage === 2) {
+                loadingEl.classList.remove('loader-stage-1');
+                loadingEl.classList.add('loader-stage-2');
+            }
+        }
+
+        function hideLoader() {
+            const loadingEl = document.querySelector('.loader');
+            loadingEl.classList.remove('show-loader');
+            setTimeout(() => {
+                loadingEl.classList.remove('loader-stage-1');
+                loadingEl.classList.remove('loader-stage-2');
+                return
+            }, 500);
+        }
+
         function obtenirLocalisation() {
+            showLoader(1)
             // Vérifier si la géolocalisation est supportée
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(montrerPosition, montrerErreursGeolocalisation);
             } else {
-                alert("Geolocation is not supported by this browser.");
+                console.log("Votre navigateur n'est pas compatible avec la géolocalisation.")
+                hideLoader()
+                const reponseEl = document.getElementById('reponse');
+                reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
             }
         }
 
@@ -266,15 +313,9 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
-            const loadingEl = document.querySelector('.loader-stage-1');
-            loadingEl.classList.remove('loader-stage-1');
-            const loaderEmptyEl = document.querySelector('.loader');
-
-            loadingEl.classList.add('loader-stage-2');
-            // loaderEmptyEl.classList.add('loader-stage-2');
-
             obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
                 if (result.ville && result.pays && result.codePostal && result.region) {
+                    showLoader(2)
                     envoyerRequeteApi(result);
                 } else {
                     const reponseEl = document.getElementById('reponse');
@@ -290,15 +331,19 @@
             switch (erreur.code) {
                 case erreur.PERMISSION_DENIED:
                     reponseEl.textContent = "Vous devez autoriser la géolocalisation pour connaitre votre parcours.";
+                    hideLoader()
                     break;
                 case erreur.POSITION_UNAVAILABLE:
                     reponseEl.textContent = "Votre navigateur ne peut pas vous donner l'information de votre position actuelle.";
+                    hideLoader()
                     break;
                 case erreur.TIMEOUT:
                     reponseEl.textContent = "Le temps imparti pour obtenir votre position a expiré.";
+                    hideLoader()
                     break;
                 case erreur.UNKNOWN_ERROR:
                     reponseEl.textContent = "Une erreur inconnue s'est produite.";
+                    hideLoader()
                     break;
             }
         }
@@ -325,6 +370,8 @@
                         stream: true
                     })
                 });
+
+                hideLoader()
 
                 // Streamer la réponse
                 const reader = reponse.body.getReader();
@@ -429,6 +476,7 @@
                                 }, 1)
                             }
                         } catch (parseError) {
+                            hideLoader()
                             console.error('Erreur lors du fetch:', parseError);
                             reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
                             reponseEl.classList.remove('justify-text');
@@ -453,6 +501,7 @@
                 }
             } catch (erreur) {
                 // reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
+                hideLoader()
                 console.error('Erreur lors du fetch:', erreur);
                 reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
                 reponseEl.classList.remove('justify-text');
