@@ -21,6 +21,11 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            /* desactiver le drag and drop */
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
         }
 
         main {
@@ -58,7 +63,7 @@
             text-justify: inter-character;
         }
 
-        .reponse-container {
+        .reponse-conteneur {
             position: relative;
             margin: 30vh 0px;
             box-sizing: border-box;
@@ -118,7 +123,7 @@
         }
 
 
-        .ombre-container {
+        .ombre-conteneur {
             position: absolute;
             opacity: 0.3;
             filter: blur(10px);
@@ -128,18 +133,30 @@
             transform: translate(calc(-50% + 90px), calc(-50% + 90px));
         }
 
-        #pointer {
-            width: 1em; height: 1em; vertical-align: middle;
+        .pointeur {
+            width: 1em; 
+            height: 1em; 
+            vertical-align: middle;
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
         }
 
-        .last-word {
-            animation: fadeIn 0.3s;
+        .word {
+            position: relative;
+            top: 7px;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
         }
 
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
+        .pointeur-animation {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .word-animation {
+            top: 0px;
+            opacity: 1;
         }
 
         
@@ -150,12 +167,12 @@
 
     
     <main>
-        <div class="reponse-container">
+        <div class="reponse-conteneur">
             <div id="reponse" class=""><div class="loader-stage-1 no-select"></div></div>
         </div>
 
-        <div class="ombre-container">
-            <div class="reponse-container no-select">
+        <div class="ombre-conteneur">
+            <div class="reponse-conteneur no-select">
                 <div id="reponse-back" class="justify-text"><div class="loader"></div></div>
             </div>
         </div>
@@ -273,14 +290,27 @@
 
                 reponseEl.classList.add('justify-text');
 
-                reponseEl.innerHTML = '';
-                reponseBackEl.innerHTML = '';
+                const pointeurIconElement = `
+                    <img class="pointeur no-select" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">
+                `
+
+                reponseEl.innerHTML = pointeurIconElement
+                reponseBackEl.innerHTML = pointeurIconElement
+
+                setTimeout(() => {
+                    const allpointeurs = document.querySelectorAll('.pointeur')
+                    allpointeurs.forEach(pointeur => {
+                        pointeur.classList.add('pointeur-animation')
+                    })
+                }, 1)
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) {
-                        document.getElementById('reponse').classList.remove('no-select');
-                        document.getElementById('pointer').remove();
+                        document.querySelector('.pointeur').classList.remove('pointeur-animation');
+                        setTimeout(() => {
+                            document.querySelector('.pointeur').remove();
+                        }, 1000)
                         break;
                     }
 
@@ -295,21 +325,29 @@
                             // Parse le JSON de la réponse
                             const parsedLine = JSON.parse(line);
                             if (parsedLine.response) {
-                                // Ajouter chaque nouveau mot à la fin du texte
-                                const lastWords = document.querySelectorAll('span.last-word')
-                                
-                                lastWords.forEach(word => {
-                                    word.removeAttribute('class')
-                                });
-                                reponseComplete += `<span class="last-word">${parsedLine.response}</span>`;
-                                const reponseWithIcon = reponseComplete + ' <img id="pointer" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">';
-                                reponseEl.insertAdjacentHTML('beforeend', `<span class="last-word">${parsedLine.response}</span>`)
-                                reponseBackEl.insertAdjacentHTML('beforeend', `<span class="last-word">${parsedLine.response}</span>`)
+
+                                const newSpan = document.createElement('span');
+                                newSpan.classList.add('word');
+                                newSpan.innerHTML = parsedLine.response;
+
+                                const newShadowSpan = newSpan.cloneNode(true);
+
+                                reponseEl.insertBefore(newSpan, reponseEl.querySelector('.pointeur'))
+                                reponseBackEl.insertBefore(newShadowSpan, reponseBackEl.querySelector('.pointeur'))
+
+                                setTimeout(() => {
+                                    const allWords = document.querySelectorAll('.word')
+                                    allWords.forEach(word => {
+                                        word.classList.add('word-animation')
+                                    })
+                                }, 1)
                             }
                         } catch (parseError) {
                             console.error('Erreur lors du fetch:', parseError);
                             reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
+                            reponseEl.classList.remove('justify-text');
                             reponseBackEl.innerHTML = ""
+
                         } finally {
                             if (isUserAtBottom) {
                                 scrollToBottom();
@@ -328,9 +366,11 @@
                     }
                 }
             } catch (erreur) {
-                reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
-                reponseBackEl.innerHTML = ""
+                // reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
                 console.error('Erreur lors du fetch:', erreur);
+                reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
+                reponseEl.classList.remove('justify-text');
+                reponseBackEl.innerHTML = "";
             }
         }
 
@@ -358,7 +398,7 @@
             // Tester si l'utilisateur est au bas de la page
             const scrollPosition = window.scrollY + window.innerHeight;
             // La valeur de threshold est calculée en fonction de la taille de la scrollbar
-            const threshold = 5; 
+            const threshold = 17; 
             const bottomPosition = document.documentElement.scrollHeight;
 
             return scrollPosition >= bottomPosition - threshold;
