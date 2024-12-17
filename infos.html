@@ -227,7 +227,7 @@
             <div id="reponse" class=""></div>
         </div>
 
-        <div class="loader no-select"></div>
+        <div id="loader" class="no-select"></div>
 
         <div class="ombre-conteneur">
             <div class="reponse-conteneur no-select">
@@ -240,7 +240,7 @@
     <script>
 
         function showLoader(stage) {
-            const loadingEl = document.querySelector('.loader');
+            const loadingEl = document.getElementById('loader');
 
             setTimeout(() => {
                 loadingEl.classList.add('show-loader');
