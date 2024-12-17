@@ -309,7 +309,7 @@
 
         async function envoyerRequeteApi(inputObject) {
 
-            const message = `Que peut-on faire dans la ville de ${inputObject.ville}, ${inputObject.codePostal}, ${inputObject.region}, ${inputObject.pays} ?`;
+            const message = `Que peut-on faire dans la ville de ${inputObject.ville} ? Voici quelques informations supplémentaire sur la ville pour t'aider à répondre : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}`;
 
             const reponseEl = document.getElementById('reponse');
             const reponseBackEl = document.getElementById('reponse-back');
@@ -382,7 +382,7 @@
 
                                 let newWord = parsedLine.response;
 
-                                newWord.replace(/\*/g, '')
+                                newWord = newWord.replace(/\*/g, '')
 
                                 // if the new word is a dot and the last word is a number add a br before
                                 if (wordsArray && wordsArray.length > 0 && newWord === '.') {
