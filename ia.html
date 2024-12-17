@@ -44,8 +44,6 @@
         #reponse, #reponse-back {
             font-family: "Inter", sans-serif;
             line-height: 1.2;
-            text-align: justify;
-            text-justify: inter-character;
             font-style: normal;
             max-width: 50vw;
             font-size: 2rem;
@@ -53,6 +51,11 @@
             color: #333;
             word-wrap: break-word;
             animation: fadeIn 1s;
+        }
+
+        .justify-text {
+            text-align: justify;
+            text-justify: inter-character;
         }
 
         .reponse-container {
@@ -192,7 +195,7 @@
             const loaderEmptyEl = document.querySelector('.loader');
 
             loadingEl.classList.add('loader-stage-2');
-            loaderEmptyEl.classList.add('loader-stage-2');
+            // loaderEmptyEl.classList.add('loader-stage-2');
 
             obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
                 envoyerRequeteApi(`Raconte moi l'histoire de la ville de ${result.city}, ${result.country}`);
@@ -243,6 +246,8 @@
                 const reader = reponse.body.getReader();
                 const decoder = new TextDecoder();
                 let reponseComplete = '';
+
+                reponseEl.classList.add('justify-text');
 
                 while (true) {
                     const { done, value } = await reader.read();
