@@ -51,11 +51,11 @@
             line-height: 1.2;
             font-style: normal;
             max-width: 50vw;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 600;
             color: #333;
             word-wrap: break-word;
-            animation: fadeIn 1s;
+            animation: fadeInSimple 1s;
         }
 
         .justify-text {
@@ -73,7 +73,7 @@
             align-items: center;
         }
 
-        @keyframes fadeIn {
+        @keyframes fadeInSimple {
             0% {opacity: 0;}
             100% {opacity: 1;}
         }
@@ -102,7 +102,7 @@
             border-radius: 100px 100px 0 0;
             position: relative;
             overflow: hidden;
-            animation: fadeIn 1s;
+            animation: fadeInSimple 1s;
         }
         .loader-stage-2::before {
             content: "";
@@ -130,7 +130,7 @@
             z-index: -1;
             top: 50%;
             left: 50%;
-            transform: translate(calc(-50% + 90px), calc(-50% + 90px));
+            transform: translate(calc(-50% + 5rem), calc(-50% + 5rem));
         }
 
         .pointeur {
@@ -159,7 +159,22 @@
             opacity: 1;
         }
 
-        
+        .titre {
+            text-align: center;
+            font-size: 2rem;
+            animation: fadeIn 1s;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
     </style>
 </head>
@@ -234,8 +249,7 @@
 
             obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
                 if (result.ville && result.pays && result.codePostal && result.region) {
-                    const message = `Raconte moi l'histoire de la ville de ${result.ville}, ${result.codePostal}, ${result.region}, ${result.pays}`;
-                    envoyerRequeteApi(message);
+                    envoyerRequeteApi(result);
                 } else {
                     const reponseEl = document.getElementById('reponse');
                     reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
@@ -266,7 +280,10 @@
         // si le dom est chargé on lance la géolocalisation
         document.addEventListener('DOMContentLoaded', obtenirLocalisation);        
 
-        async function envoyerRequeteApi(inputString) {
+        async function envoyerRequeteApi(inputObject) {
+
+            const message = `Raconte moi l'histoire de la ville de ${inputObject.ville}, ${inputObject.codePostal}, ${inputObject.region}, ${inputObject.pays}`;
+
             const reponseEl = document.getElementById('reponse');
             const reponseBackEl = document.getElementById('reponse-back');
 
@@ -278,7 +295,7 @@
                     },
                     body: JSON.stringify({
                         model: 'mistral:latest',
-                        prompt: inputString,
+                        prompt: message,
                         stream: true
                     })
                 });
@@ -294,8 +311,10 @@
                     <img class="pointeur no-select" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">
                 `
 
-                reponseEl.innerHTML = pointeurIconElement
-                reponseBackEl.innerHTML = pointeurIconElement
+                const baseContent = `<div class="titre">Que pouvez-vous faire à ${inputObject.ville} ?</div> <br> ${pointeurIconElement}`
+
+                reponseEl.innerHTML = baseContent
+                reponseBackEl.innerHTML = baseContent
 
                 setTimeout(() => {
                     const allpointeurs = document.querySelectorAll('.pointeur')
