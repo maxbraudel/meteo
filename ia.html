@@ -8,42 +8,223 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test générateur IA</title>
     <style>
-        html, body {
+
+        body {
             margin: 0;
             padding: 0;
-            height: 100%;
         }
-        body {
+
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        section {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            text-align: center;
+            position: relative;
         }
-        #reponse {
+
+        .disable-scroll {
+            -ms-overflow-style: none;  
+            scrollbar-width: none;
+        }
+        .disable-scroll::-webkit-scrollbar { 
+            display: none;
+        }
+
+        #reponse, #reponse-back {
             font-family: "Inter", sans-serif;
             line-height: 1.2;
             text-align: justify;
             text-justify: inter-character;
             font-style: normal;
             max-width: 50vw;
-            font-size: 28px;
+            font-size: 2rem;
             font-weight: 600;
             color: #333;
-            padding: 30px;
-            border-radius: 10px;
-            overflow-wrap: break-word;
-            overflow-y: auto;
+            word-wrap: break-word;
+            animation: fadeIn 1s;
         }
+
+        .reponse-container {
+            position: relative;
+            margin: 30vh 0px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            0% {opacity: 0;}
+            100% {opacity: 1;}
+        }
+
+        .loader-stage-1 {
+            height: 30px;
+            aspect-ratio: 2.5;
+            --_g: no-repeat radial-gradient(farthest-side, #000 90%, #0000);
+            background: var(--_g), var(--_g), var(--_g), var(--_g);
+            background-size: 20% 50%;
+            animation: l43 1s infinite linear; 
+        }
+        @keyframes l43 {
+            0%     {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
+            16.67% {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
+            33.33% {background-position: calc(0*100%/3) 100%,calc(1*100%/3) 0   ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
+            50%    {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 50% }
+            66.67% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 100%,calc(3*100%/3) 0   }
+            83.33% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 100%}
+            100%   {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
+        }
+
+        .loader-stage-2 {
+            width: 80px;
+            height: 40px;
+            border-radius: 100px 100px 0 0;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s;
+        }
+        .loader-stage-2::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 -100%;
+            background: 
+                radial-gradient(farthest-side,#ffd738 80%,#0000) left 70% top    20%/15px 15px,
+                radial-gradient(farthest-side,#020308 92%,#0000) left 65% bottom 19%/12px 12px,
+                radial-gradient(farthest-side,#ecfefe 92%,#0000) left 70% bottom 20%/15px 15px,
+                linear-gradient(#9eddfe 50%,#020308 0);
+            background-repeat: no-repeat;
+            animation: l5 2s infinite;
+            }
+            @keyframes l5 {
+            0%,20%   {transform: rotate(0)}
+            40%,60%  {transform: rotate(.5turn)}
+            80%,100% {transform: rotate(1turn)}
+        }
+
+
+        .ombre-container {
+            position: absolute;
+            opacity: 0.3;
+            filter: blur(10px);
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            transform: translate(calc(-50% + 90px), calc(-50% + 90px));
+        }
+
     </style>
 </head>
 <body>
-    <div id="reponse"><span style="font-size: 60px;">...</span></div>
+
+    
+    <section>
+        <div class="reponse-container">
+            <div id="reponse" class="no-select"><div class="loader-stage-1 no-select"></div></div>
+        </div>
+
+        <div class="ombre-container">
+            <div class="reponse-container no-select">
+                <div id="reponse-back"><div class="loader"></div></div>
+            </div>
+        </div>
+    </section>
+        
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+
+        function obtenirLocalisation() {
+            // Vérifier si la géolocalisation est supportée
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(montrerPosition, montrerErreursGeolocalisation);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function obtenirVilleLaPlusProche(lat, lon) {
+        // Url de l'API de Nominatim
+        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`;
+        return fetch(url)
+            .then((reponse) => {
+            if (!reponse.ok) {
+                throw new Error('Erreur réseau');
+            }
+            return reponse.json();
+            })
+            .then((donnes) => {
+            // Recup les informations de la ville
+            const city = donnes.address.city || 
+            donnes.address.town || 
+            donnes.address.village || "Ville inconnue";
+            const country = donnes.address.country || "Pays inconnu";
+
+            // Retourner les informations de la ville
+            return {
+                city: city,
+                country: country
+            };
+            })
+            .catch((erreur) => {
+            console.error('Erreur lors du fetch:', erreur);
+            return { city: null, country: null };
+            });
+        }
+
+        async function montrerPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            const loadingEl = document.querySelector('.loader-stage-1');
+            loadingEl.classList.remove('loader-stage-1');
+            const loaderEmptyEl = document.querySelector('.loader');
+
+            loadingEl.classList.add('loader-stage-2');
+            loaderEmptyEl.classList.add('loader-stage-2');
+
+            obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
+                envoyerRequeteApi(`Raconte moi l'histoire de la ville de ${result.city}, ${result.country}`);
+            });
+
+        }
+
+        function montrerErreursGeolocalisation(erreur) {
             const reponseEl = document.getElementById('reponse');
+            // Handle error cases
+            switch (erreur.code) {
+                case erreur.PERMISSION_DENIED:
+                    reponseEl.textContent = "Vous devez autoriser la géolocalisation pour connaitre votre parcours.";
+                    break;
+                case erreur.POSITION_UNAVAILABLE:
+                    reponseEl.textContent = "Votre navigateur ne peut pas vous donner l'information de votre position actuelle.";
+                    break;
+                case erreur.TIMEOUT:
+                    reponseEl.textContent = "Le temps imparti pour obtenir votre position a expiré.";
+                    break;
+                case erreur.UNKNOWN_ERROR:
+                    reponseEl.textContent = "Une erreur inconnue s'est produite.";
+                    break;
+            }
+        }
+
+        // si le dom est chargé on lance la géolocalisation
+        document.addEventListener('DOMContentLoaded', obtenirLocalisation);        
+
+        async function envoyerRequeteApi(inputString) {
+            const reponseEl = document.getElementById('reponse');
+            const reponseBackEl = document.getElementById('reponse-back');
 
             try {
                 const reponse = await fetch('https://ollama.maxbraudel.com/api/generate', {
@@ -53,7 +234,7 @@
                     },
                     body: JSON.stringify({
                         model: 'mistral:latest',
-                        prompt: "Just be kind.",
+                        prompt: inputString,
                         stream: true
                     })
                 });
@@ -65,21 +246,45 @@
 
                 while (true) {
                     const { done, value } = await reader.read();
-                    if (done) break;
+                    if (done) {
+                        document.getElementById('reponse').classList.remove('no-select');
+                        document.getElementById('pointer').remove();
+                        break;
+                    }
 
                     const chunk = decoder.decode(value);
                     const lines = chunk.split('\n').filter(line => line.trim() !== '');
 
                     for (const line of lines) {
+                        // Tester si l'utilisateur est au bas de la page
+                        const isUserAtBottom = testIfUserIsAtBottom();
                         try {
+                            // Parse le JSON de la réponse
                             const parsedLine = JSON.parse(line);
                             if (parsedLine.response) {
+                                // Ajouter chaque nouveau mot à la fin du texte
                                 reponseComplete += parsedLine.response;
-                                reponseEl.innerHTML = reponseComplete;
+                                const reponseWithIcon = reponseComplete + ' <img id="pointer" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__" style="width: 1em; height: 1em; vertical-align: middle;">';
+                                reponseEl.innerHTML = reponseWithIcon
+                                reponseBackEl.innerHTML = reponseWithIcon
                             }
                         } catch (parseError) {
                             console.error('Erreur lors du fetch:', parseError);
                             reponseEl.textContent = "L'API est inacessible, veuillez réessayer plus tard.";
+                        } finally {
+                            if (isUserAtBottom) {
+                                scrollToBottom();
+                            } else {
+                                // stopper le mouvement de scroll en cours
+                                window.scrollTo({
+                                    top: window.scrollY,
+                                    left: window.scrollX,
+                                    behavior: "instant" 
+                                });
+
+                                // afficher la scrollbar
+                                document.querySelector('html').classList.remove('disable-scroll');
+                            }
                         }
                     }
                 }
@@ -87,7 +292,38 @@
                 reponseEl.textContent = "L'API est inacessible, veuillez réessayer plus tard.";
                 console.error('Erreur lors du fetch:', erreur);
             }
-        });
+        }
+
+        let displayScrollTimeout
+
+        function scrollToBottom() {
+
+            // supprimer le timeout d'affichage de la scrollbar car elle doit encore être cachée
+            clearTimeout(displayScrollTimeout);
+            document.querySelector('html').classList.add('disable-scroll');
+
+            // Scroller jusqu'au bas de la page
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+
+            // afficher la scrollbar au bout de 1 seconde
+            displayScrollTimeout = setTimeout(() => {
+                document.querySelector('html').classList.remove('disable-scroll');
+            }, 1000);
+        }
+
+        function testIfUserIsAtBottom() {
+            // Tester si l'utilisateur est au bas de la page
+            const scrollPosition = window.scrollY + window.innerHeight;
+            // La valeur de threshold est calculée en fonction de la taille de la scrollbar
+            const threshold = 5; 
+            const bottomPosition = document.documentElement.scrollHeight;
+
+            return scrollPosition >= bottomPosition - threshold;
+        }
+
     </script>
 </body>
 </html>
