@@ -132,6 +132,18 @@
             width: 1em; height: 1em; vertical-align: middle;
         }
 
+        .last-word {
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+        }
+
+        
+
     </style>
 </head>
 <body>
@@ -139,7 +151,7 @@
     
     <main>
         <div class="reponse-container">
-            <div id="reponse" class="no-select"><div class="loader-stage-1 no-select"></div></div>
+            <div id="reponse" class=""><div class="loader-stage-1 no-select"></div></div>
         </div>
 
         <div class="ombre-container">
@@ -261,6 +273,9 @@
 
                 reponseEl.classList.add('justify-text');
 
+                reponseEl.innerHTML = '';
+                reponseBackEl.innerHTML = '';
+
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) {
@@ -275,19 +290,26 @@
                     for (const line of lines) {
                         // Tester si l'utilisateur est au bas de la page
                         const isUserAtBottom = testIfUserIsAtBottom();
+    
                         try {
                             // Parse le JSON de la réponse
                             const parsedLine = JSON.parse(line);
                             if (parsedLine.response) {
                                 // Ajouter chaque nouveau mot à la fin du texte
-                                reponseComplete += parsedLine.response;
+                                const lastWords = document.querySelectorAll('span.last-word')
+                                
+                                lastWords.forEach(word => {
+                                    word.removeAttribute('class')
+                                });
+                                reponseComplete += `<span class="last-word">${parsedLine.response}</span>`;
                                 const reponseWithIcon = reponseComplete + ' <img id="pointer" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">';
-                                reponseEl.innerHTML = reponseWithIcon
-                                reponseBackEl.innerHTML = reponseWithIcon
+                                reponseEl.insertAdjacentHTML('beforeend', `<span class="last-word">${parsedLine.response}</span>`)
+                                reponseBackEl.insertAdjacentHTML('beforeend', `<span class="last-word">${parsedLine.response}</span>`)
                             }
                         } catch (parseError) {
                             console.error('Erreur lors du fetch:', parseError);
-                            reponseEl.textContent = "L'API est inacessible, veuillez réessayer plus tard.";
+                            reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
+                            reponseBackEl.innerHTML = ""
                         } finally {
                             if (isUserAtBottom) {
                                 scrollToBottom();
@@ -306,7 +328,8 @@
                     }
                 }
             } catch (erreur) {
-                reponseEl.textContent = "L'API est inacessible, veuillez réessayer plus tard.";
+                reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
+                reponseBackEl.innerHTML = ""
                 console.error('Erreur lors du fetch:', erreur);
             }
         }
