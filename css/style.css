@@ -1,0 +1,206 @@
+*{
+    margin:0;
+    padding:0;
+
+    font-family: Inter;
+    overflow-x: hidden;
+}
+
+*, *::after, *::before {
+    box-sizing: border-box;
+}
+
+
+img{
+    display: block;
+}
+
+p, a {
+    font-size: 18px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+h2{
+    font-size: 48px;
+}
+
+header{
+    margin: 2.5%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+header nav ul {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+header nav ul li {
+    list-style-type: none;
+    width: 20vh;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: black;
+}
+
+#mobile-menu-btn {
+    display: none; 
+    cursor: pointer;
+}
+
+#mobile-menu {
+    display: none;
+    position: fixed; 
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 30%; 
+    padding:5%;
+    background-color: #fff; 
+    z-index: 1000;
+    
+
+    justify-content: space-between;
+}
+
+#mobile-menu ul {
+    list-style-type: none;
+}
+
+main #banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    height: 90vh;
+}
+
+main #banner h1 {
+    font-size: 96px;
+}
+
+main #banner p {
+    font-size: 25px;
+}
+
+.btn {
+    background-color: black;
+    color:white;
+    margin:1%;
+    padding:1%;
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+main #banner a {
+    width:8%;
+}
+
+#meteo-section, #city-section {
+    background-color: #EFEFEF;
+    padding: 2.5%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#meteo-section{
+    background-color: #EFEFEF;
+}
+
+#city-section{
+    background-color: #fff;
+}
+
+#meteo-section-text, #city-section-text{
+    width: 40%;
+    line-height: 1.6;
+}
+
+#city-section-text h2 {
+    width:80%;
+}
+
+#meteo-section-text p, #city-section-text p {
+    margin-top: 5%;
+}
+
+#meteo-section-text a{
+    margin-top: 5%;
+    width: 25%;
+}
+
+#city-section-text a{
+    margin-top: 5%;
+    width: 20%;
+}
+
+#meteo-section-img img, #city-section-img img{
+    height: 40vh;
+    object-fit: contain;
+}
+
+@media (max-width: 768px) {
+
+    header{
+        margin:5%;
+    }
+
+    #mobile-menu-btn {
+        display: flex;
+    }
+
+    #desktop-menu {
+        display: none;
+    }
+
+    main #banner h1 {
+        font-size: 32px;
+        text-align: center;
+    }
+
+    main #banner p, main #banner a {
+        font-size: 16px;
+    }
+
+    main #banner a {
+        width: 120px;
+        margin: 5%;
+        padding: 2.5%;
+    }
+
+    #meteo-section, #city-section {
+        flex-direction: column;
+        padding: 10% 0;
+        margin-bottom: 10%;
+    }
+
+    #meteo-section-text, #city-section-text{
+        width: 80%;
+        margin-bottom: 10%;
+    }
+
+    h2{
+        font-size: 32px;
+    }
+
+    #meteo-section-text a {
+        width:60%;
+        padding: 2%;
+    }
+
+    #city-section-text a {
+        width:45%;
+        padding: 2%; 
+    }
+}

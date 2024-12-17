@@ -3,9 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Weather for you 🌤</title>
 </head>
 <body>
+
+    <header>
+        <nav id="desktop-menu">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="#">La météo</a></li>
+                <li><a href="ia.html">La ville</a></li>
+            </ul>
+        </nav>
+
+        <div id="mobile-menu-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-justify"><path d="M3 12h18"/><path d="M3 18h18"/><path d="M3 6h18"/></svg>
+        </div>
+
+        <div id="mobile-menu">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="#">La météo</a></li>
+                <li><a href="ia.html">La ville</a></li>
+            </ul>
+            <div id="return">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+        </div>
+
+
+
+    </header>
+
+    <main>
+            <div id="banner">
+                <div id="title">
+                    <h1>weather for you 🌞</h1>
+                    <img src="" alt="">
+                </div>
+                <p>Consultez la météo</p>
+                <a href="#" class="btn">Accéder<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+            </div>
+
+            <div id="meteo-section">
+                <div id="meteo-section-text">
+                    <h2>la météo accessible 👀</h2>
+                    <p>Restez informé des conditions météorologiques en temps réel. Consultez les prévisions précises pour aujourd’hui et les jours à venir, où que vous soyez. Qu’il fasse soleil, qu’il pleuve ou que le vent souffle, notre service vous accompagne pour mieux planifier vos journées.</p>
+                    <a class="btn" href="">Voir la météo<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                </div>
+                <div id="meteo-section-img">
+                    <img src="img/meteo.png" alt="">
+                </div>
+            </div>
+
+            <div id="city-section">
+                <div id="city-section-img">
+                    <img src="img/activtes.png" alt="">
+                </div>
+                <div id="city-section-text">
+                    <h2>des infos sur votre localisation ? 📍</h2>
+                    <p>Peu importe le temps, il y a toujours une activité à faire. Notre service vous propose des idées variées et originales pour profiter pleinement de chaque moment. Que vous cherchiez à vous détendre, à vous divertir ou à vous aventurer, laissez-vous surprendre par nos suggestions pensées pour enrichir votre quotidien.</p>
+                    <a class="btn" href="">Les infos<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                </div>
+                
+            </div>
+    </main>
     
 </body>
+<script>
+    
+    const menuIcon = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const returnButton = document.getElementById('return');
+
+    // Ouverture du menu mobile
+    menuIcon.addEventListener('click', () => {
+        mobileMenu.style.display = 'flex';
+
+    });
+
+    // Fermeture du menu mobile
+    returnButton.addEventListener('click', () => {
+        mobileMenu.style.display = 'none';
+
+
+    });
+
+
+
+</script>
 </html>
