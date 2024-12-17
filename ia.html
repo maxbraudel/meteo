@@ -3,7 +3,7 @@
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test générateur IA</title>
@@ -140,7 +140,7 @@
 
         <div class="ombre-container">
             <div class="reponse-container no-select">
-                <div id="reponse-back"><div class="loader"></div></div>
+                <div id="reponse-back" class="justify-text"><div class="loader"></div></div>
             </div>
         </div>
     </section>
@@ -159,7 +159,7 @@
 
         function obtenirVilleLaPlusProche(lat, lon) {
         // Url de l'API de Nominatim
-        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`;
+        const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
         return fetch(url)
             .then((reponse) => {
             if (!reponse.ok) {
@@ -169,20 +169,22 @@
             })
             .then((donnes) => {
             // Recup les informations de la ville
-            const city = donnes.address.city || 
-            donnes.address.town || 
-            donnes.address.village || "Ville inconnue";
-            const country = donnes.address.country || "Pays inconnu";
+            const ville = donnes.city
+            const codePostal = donnes.postcode
+            const region = donnes.principalSubdivision
+            const pays = donnes.countryName 
 
             // Retourner les informations de la ville
             return {
-                city: city,
-                country: country
+                ville: ville,
+                pays: pays,
+                codePostal: codePostal,
+                region: region
             };
             })
             .catch((erreur) => {
             console.error('Erreur lors du fetch:', erreur);
-            return { city: null, country: null };
+            return { ville: null, country: null, postCode: null, region: null };
             });
         }
 
@@ -198,7 +200,13 @@
             // loaderEmptyEl.classList.add('loader-stage-2');
 
             obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
-                envoyerRequeteApi(`Raconte moi l'histoire de la ville de ${result.city}, ${result.country}`);
+                if (result.ville && result.pays && result.codePostal && result.region) {
+                    const message = `Raconte moi l'histoire de la ville de ${result.ville}, ${result.codePostal}, ${result.region}, ${result.pays}`;
+                    envoyerRequeteApi(message);
+                } else {
+                    const reponseEl = document.getElementById('reponse');
+                    reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
+                }
             });
 
         }
