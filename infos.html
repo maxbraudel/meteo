@@ -477,15 +477,30 @@
 
                 while (true) {
 
+                    const allPointers = document.querySelectorAll('.pointeur')
+
+                    allPointers.forEach(pointeur => {
+                        if (!pointeur.classList.contains('pointeur-animation')) {
+                            pointeur.classList.add('pointeur-animation')
+                        }
+                    })
+
                     const { done, value } = await reader.read();
-                    console.log(value)
                     if (done) {
-                        document.querySelector('.pointeur').classList.remove('pointeur-animation');
-                        setTimeout(() => {
-                            document.querySelector('.pointeur').remove();
-                        }, 1000)
+                        
+                        allPointers.forEach(pointeur => {
+                            pointeur.classList.remove('pointeur-animation')
+
+                            setTimeout(() => {
+                                pointeur.remove()
+                            }, 1000)
+
+                        })
+                        
                         break;
                     }
+
+                    document.querySelector('.pointeur').classList.add('pointeur-animation');
 
                     const chunk = decoder.decode(value);
                     const lines = chunk.split('\n').filter(line => line.trim() !== '');
@@ -496,6 +511,8 @@
     
                         try {
                             // Parse le JSON de la réponse
+                            console.log(line)
+
                             const parsedLine = JSON.parse(line);
                             if (parsedLine.response) {
 
@@ -579,11 +596,14 @@
                             }
                         } catch (parseError) {
                             console.error('Erreur lors du fetch:', parseError);
+                                                    
+                            allPointers.forEach(pointeur => {
+                                pointeur.classList.remove('pointeur-animation')    
+                            })
 
                         } finally {
                             if (isUserAtBottom) {
-                                    scrollToBottom();
-
+                                scrollToBottom();
                             } else {
                                 // stopper le mouvement de scroll en cours
                                 window.scrollTo({
