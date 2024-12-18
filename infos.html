@@ -204,6 +204,7 @@
             transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
+            z-index: 2;
         }
 
         .show-loader {
@@ -248,6 +249,44 @@
             will-change: transform;
         }
 
+        .alert {
+            z-index: 1;
+            text-align: center;
+            width: 100%;
+            padding: 10px 20px;
+            color: #333;
+            /* transparent blur glass background */
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+            font-family: "Inter", sans-serif;
+            font-weight: 200;
+            text-transform:uppercase;
+            /* text italic */
+            position: fixed;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .alert p {
+            animation: flash 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes flash {
+            from {
+                opacity: 0.5;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .show-alert {
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
@@ -260,6 +299,9 @@
             <div id="reponse" class=""></div>
         </div>
         <div class="loader no-select"></div>
+        <div class="alert">
+            <p></p>
+        </div>
     </main>
         
 
@@ -285,8 +327,27 @@
             }
         }
 
+        function showAlert(message) {
+            const alertEl = document.querySelector('.alert');
+            const alertTextEl = alertEl.querySelector('p');
+            alertTextEl.textContent = message;
+            alertEl.classList.add('show-alert');
+        }
+
+        async function hideAlert() {
+            const alertEl = document.querySelector('.alert');
+            alertEl.classList.remove('show-alert');
+            setTimeout(() => {
+                alertEl.classList.remove('show-alert');
+                return
+            }, 500);
+
+            await delay(500);
+        }
+
 
         async function hideLoader() {
+            hideAlert()
             const loadingEl = document.querySelector('.loader');
             loadingEl.classList.remove('show-loader');
             setTimeout(() => {
@@ -399,18 +460,22 @@
                 case erreur.PERMISSION_DENIED:
                     await hideLoader()
                     reponseEl.textContent = "Vous devez autoriser la géolocalisation pour connaitre votre parcours.";
+                    reponseEl.style.textAlign = 'center';
                     break;
                 case erreur.POSITION_UNAVAILABLE:
                     await hideLoader()
                     reponseEl.textContent = "Votre navigateur ne peut pas vous donner l'information de votre position actuelle.";
+                    reponseEl.style.textAlign = 'center';
                     break;
                 case erreur.TIMEOUT:
                     await hideLoader()
                     reponseEl.textContent = "Le temps imparti pour obtenir votre position a expiré.";
+                    reponseEl.style.textAlign = 'center';
                     break;
                 case erreur.UNKNOWN_ERROR:
                     await hideLoader()
                     reponseEl.textContent = "Une erreur inconnue s'est produite.";
+                    reponseEl.style.textAlign = 'center';
                     break;
             }
         }
@@ -421,6 +486,7 @@
         async function envoyerRequeteApi(inputObject) {
 
             showLoader(2)
+            showAlert('Génération du message')
 
             // const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}. (emojis)`;
             const message = `
@@ -630,6 +696,7 @@
                 await hideLoader()
                 reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
                 reponseEl.classList.remove('justify-text');
+                reponseEl.style.textAlign = 'center';
                 reponseBackEl.innerHTML = "";
             }
         }
