@@ -178,28 +178,13 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .reponse-conteneur {
-                margin: 10vh 0px;
-            }
-
-            #reponse, #reponse-back {
-                font-size: 1rem;
-            }
-
-            .titre {
-                font-size: 1.5rem;
-                margin-bottom: 1.8rem;
-            }
-        }
-
         br {
             margin-left: 100px;
         }
 
         
         .indent {
-            Padding-left:5vw;
+            Padding-left:60px
         }
 
         /* center loader on the page */
@@ -215,6 +200,34 @@
 
         .show-loader {
             opacity: 1;
+        }
+
+        .big-emoji {
+            font-size: 7rem;
+            filter: blur(7px);
+            opacity: 0.5;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @media (max-width: 768px) {
+            .reponse-conteneur {
+                margin: 10vh 0px;
+            }
+
+            #reponse, #reponse-back {
+                font-size: 1rem;
+            }
+
+            .titre {
+                font-size: 1.5rem;
+                margin-bottom: 1.8rem;
+            }
+
+            .indent {
+                Padding-left:10px
+            }
         }
 
     </style>
@@ -270,7 +283,7 @@
                 return
             }, 500);
 
-            await delay(300);
+            await delay(500);
         }
 
         function refreshLocalisation() {
@@ -383,7 +396,16 @@
 
             showLoader(2)
 
-            const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville pour t'aider à répondre : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}`;
+            // const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}. (emojis)`;
+            const message = `
+                Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ?.
+                Informations sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}.
+                Commence à introduire la ville en une phrase puis rédige une liste ordonnée d'activités détaillées en lien avec des lieux connus propres à la ville ou à ses alentours..
+                Ajoute un emoji au tout début de chaque activité dans la liste. 
+                Les emojis doivent être variés et illustrent les activités.
+                Modèle de paragraphe dans la liste : {numéro}. {emoji} {nom de l'activité} : {description détaillée}. 
+                Exemple : 1. 🏃‍♂️ Jogger : {description détaillée}.
+            `;
 
             const reponseEl = document.getElementById('reponse');
             const reponseBackEl = document.getElementById('reponse-back');
@@ -395,9 +417,10 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'mistral:latest',
+                        model: 'llama3.2-vision:latest',
                         prompt: message,
-                        stream: true
+                        stream: true,
+                        reset_context: true
                     })
                 });
 
@@ -460,15 +483,26 @@
 
                                 newWord = newWord.replace(/\*/g, '')
 
+                                if (newWord === '♂' || newWord === '♀') {
+                                    newWord = '';
+                                }
+
+                                function containsEmoji(text) {
+                                    const emojiRegex = /^(?:[\u2700-\u27bf]|(?:[\ud83c\udde6-\ud83c\uddff]){2}|[\ud800\udc00-\udbff\udfff]|[\u2600-\u26FF\u2700-\u27BF]|(?:[\ud83d\udc00-\ud83d\ude4f]|[\ud83d\ude80-\ud83d\udeff]|[\u2600-\u26ff]|[\u2700-\u27bf]|\ud83c[\udde0-\ud83c\uddff])+)$/u;
+                                    
+                                    return emojiRegex.test(text.trim());
+                                }
+
+
                                 // if the new word is a dot and the last word is a number add a br before
                                 if (wordsArray && wordsArray.length > 0 && newWord === '.') {
 
                                     const lastWordElement = wordsArray[wordsArray.length - 1];
-                                    const lastLastWordElement = wordsArray[wordsArray.length - 2] || null;
+                                    const lastLastLastWordElement = wordsArray[wordsArray.length - 3] || null;
 
                                     const lastShadowWordElement = shadowWordsArray[shadowWordsArray.length - 1];
 
-                                    if (lastWordElement.textContent.match(/^\d/) && (lastLastWordElement === null || !lastLastWordElement.textContent.match(/^\d/))) {
+                                    if (lastWordElement.textContent.match(/^\d/) && (lastLastLastWordElement === null || !lastLastLastWordElement.textContent.match(/^\d/))) {
                                         // add a br before last word element
                                         const br = document.createElement('br');
                                         const span = document.createElement('span');
@@ -497,6 +531,19 @@
 
                                 reponseEl.insertBefore(newSpan, reponseEl.querySelector('.pointeur'))
                                 reponseBackEl.insertBefore(newShadowSpan, reponseBackEl.querySelector('.pointeur'))
+
+
+                                if (containsEmoji(newWord) === true) {
+                                    // log the coordinates of reponseEl
+
+                                    const bigEmojiElement = document.createElement('span');
+                                    bigEmojiElement.textContent = newWord;
+                                    bigEmojiElement.classList.add('big-emoji');
+                                    bigEmojiElement.style.left = "-300px";
+                                    bigEmojiElement.style.transform = `rotate(${Math.random() * 120 - 60}deg)`;
+
+                                    newSpan.appendChild(bigEmojiElement);
+                                }
 
                                 setTimeout(() => {
                                     const allWords = document.querySelectorAll('.word')
