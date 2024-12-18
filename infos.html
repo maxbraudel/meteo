@@ -297,7 +297,7 @@
             <div id="reponse" class=""></div>
         </div>
         <div class="loader no-select"></div>
-        <div class="alert">
+        <div class="alert no-select">
             <p></p>
         </div>
     </main>
@@ -484,7 +484,11 @@
         async function envoyerRequeteApi(inputObject) {
 
             showLoader(2)
-            showAlert('Génération du message')
+            showAlert('Génération de votre parcours')
+
+            const alertTimeOut = setTimeout(() => {
+                showAlert('Cela peut prendre un moment')
+            }, 10000)
 
             // const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}. (emojis)`;
             const message = `
@@ -514,6 +518,7 @@
                     })
                 });
 
+                clearTimeout(alertTimeOut)
                 await hideLoader()
                 scrollToBottom();
 
