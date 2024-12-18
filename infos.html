@@ -221,6 +221,7 @@
 </head>
 <body>
 
+    <div onclick="refreshLocalisation()">Rafraichir ma position</div>
     
     <main>
         <div class="reponse-conteneur">
@@ -239,6 +240,10 @@
 
     <script>
 
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         function showLoader(stage) {
             const loadingEl = document.querySelector('.loader');
 
@@ -255,7 +260,8 @@
             }
         }
 
-        function hideLoader() {
+
+        async function hideLoader() {
             const loadingEl = document.querySelector('.loader');
             loadingEl.classList.remove('show-loader');
             setTimeout(() => {
@@ -263,18 +269,41 @@
                 loadingEl.classList.remove('loader-stage-2');
                 return
             }, 500);
+
+            await delay(300);
         }
 
-        function obtenirLocalisation() {
-            showLoader(1)
+        function refreshLocalisation() {
+            localStorage.removeItem('position');
+            location.reload();
+        }
+
+        async function obtenirLocalisation() {
             // Vérifier si la géolocalisation est supportée
+            if (localStorage.getItem('position')) {
+                montrerPosition(JSON.parse(localStorage.getItem('position')));
+                return;
+            }
+            showLoader(1)
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(montrerPosition, montrerErreursGeolocalisation);
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        localStorage.setItem('position', JSON.stringify(position));
+                        // montrer un nouveau loader pendant la géolocalisation
+                        montrerPosition(position);
+                    }, 
+                    montrerErreursGeolocalisation,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000, 
+                        maximumAge: 0
+                    }
+                );
             } else {
                 console.log("Votre navigateur n'est pas compatible avec la géolocalisation.")
-                hideLoader()
+                await hideLoader()
                 const reponseEl = document.getElementById('reponse');
-                reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
+                reponseEl.textContent = "Votre navigateur n'est pas compatible avec la géolocalisation.";
             }
         }
 
@@ -315,7 +344,6 @@
 
             obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
                 if (result.ville && result.pays && result.codePostal && result.region) {
-                    showLoader(2)
                     envoyerRequeteApi(result);
                 } else {
                     const reponseEl = document.getElementById('reponse');
@@ -325,25 +353,25 @@
 
         }
 
-        function montrerErreursGeolocalisation(erreur) {
+        async function montrerErreursGeolocalisation(erreur) {
             const reponseEl = document.getElementById('reponse');
             // Handle error cases
             switch (erreur.code) {
                 case erreur.PERMISSION_DENIED:
+                    await hideLoader()
                     reponseEl.textContent = "Vous devez autoriser la géolocalisation pour connaitre votre parcours.";
-                    hideLoader()
                     break;
                 case erreur.POSITION_UNAVAILABLE:
+                    await hideLoader()
                     reponseEl.textContent = "Votre navigateur ne peut pas vous donner l'information de votre position actuelle.";
-                    hideLoader()
                     break;
                 case erreur.TIMEOUT:
+                    await hideLoader()
                     reponseEl.textContent = "Le temps imparti pour obtenir votre position a expiré.";
-                    hideLoader()
                     break;
                 case erreur.UNKNOWN_ERROR:
+                    await hideLoader()
                     reponseEl.textContent = "Une erreur inconnue s'est produite.";
-                    hideLoader()
                     break;
             }
         }
@@ -352,6 +380,8 @@
         document.addEventListener('DOMContentLoaded', obtenirLocalisation);        
 
         async function envoyerRequeteApi(inputObject) {
+
+            showLoader(2)
 
             const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville pour t'aider à répondre : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}`;
 
@@ -371,7 +401,7 @@
                     })
                 });
 
-                hideLoader()
+                await hideLoader()
 
                 // Streamer la réponse
                 const reader = reponse.body.getReader();
@@ -476,8 +506,8 @@
                                 }, 1)
                             }
                         } catch (parseError) {
-                            hideLoader()
                             console.error('Erreur lors du fetch:', parseError);
+                            await hideLoader()
                             reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
                             reponseEl.classList.remove('justify-text');
                             reponseBackEl.innerHTML = ""
@@ -501,9 +531,8 @@
                     }
                 }
             } catch (erreur) {
-                // reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
-                hideLoader()
                 console.error('Erreur lors du fetch:', erreur);
+                await hideLoader()
                 reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
                 reponseEl.classList.remove('justify-text');
                 reponseBackEl.innerHTML = "";
