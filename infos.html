@@ -3,7 +3,7 @@
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link preload href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test générateur IA</title>
@@ -42,6 +42,7 @@
         main {
             height: 100%;
             width: 50vw;
+            max-width: 700px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -81,7 +82,7 @@
             opacity: 0.3;
             filter: blur(10px);
             z-index: -1;
-            transform: translate(10vw, 10vh);
+            transform: translate(100px, 100px);
         }
 
         .justify-text {
@@ -235,7 +236,7 @@
 
             main {
                 width: calc(50vw + (800px - 100vw));
-                max-width: 90vw
+                max-width: 80vw
             }
         }
 
@@ -305,9 +306,11 @@
 
         async function obtenirLocalisation() {
             // Vérifier si la géolocalisation est supportée
-            if (localStorage.getItem('position')) {
+            console.log(localStorage.getItem('position'))
+            if  (localStorage.getItem('position') && JSON.parse(localStorage.getItem('position')).coords.latitude) {
                 console.log('position trouvée dans la base de données')
                 montrerPosition(JSON.parse(localStorage.getItem('position')));
+                console.log(localStorage.getItem('position'))
                 return;
             }
             showLoader(1)
@@ -372,7 +375,7 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
-            if (localStorage.getItem('infosVille')) {
+            if (localStorage.getItem('infosVille') && JSON.parse(localStorage.getItem('infosVille')).ville) {
                 console.log('infosVille trouvée dans la base de données')
                 envoyerRequeteApi(JSON.parse(localStorage.getItem('infosVille')));
                 return;
@@ -448,6 +451,7 @@
                 });
 
                 await hideLoader()
+                scrollToBottom();
 
                 // Streamer la réponse
                 const reader = reponse.body.getReader();
@@ -459,8 +463,11 @@
                 const pointeurIconElement = `
                     <img class="pointeur no-select" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">
                 `
-
-                const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${inputObject.ville}</div>${pointeurIconElement}`
+                function lierLesTiretsDansUnString(input) {
+                    // Replace every hyphen "-" with a hyphen followed by the WORD JOINER "\u2060"
+                    return input.replace(/-/g, '-\u2060');
+                }
+                const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${lierLesTiretsDansUnString(inputObject.ville)}</div>${pointeurIconElement}`
 
                 reponseEl.innerHTML = baseContent
                 reponseBackEl.innerHTML = baseContent
