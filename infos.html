@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test générateur IA</title>
     <style>
 
-        body {
+        html, body {
+            overflow-x: hidden;
             margin: 0;
             padding: 0;
+            overflow-anchor: none; /* Empêcher les layout shifts */
         }
 
         .no-select {
@@ -28,14 +30,30 @@
             -o-user-drag: none;
         }
 
-        main {
-            margin: 0;
-            padding: 0;
+        body {
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            
+        }
+
+        main {
+            height: 100%;
+            width: 50vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .reponse-container {
+            padding: 10vw 0;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
         }
 
         .disable-scroll {
@@ -47,30 +65,28 @@
         }
 
         #reponse, #reponse-back {
+            width: 100%;
+            box-sizing: border-box;
             font-family: "Inter", sans-serif;
             line-height: 1.2;
             font-style: normal;
-            width: 50vw;
             font-size: 1.7rem;
             font-weight: 600;
             color: #333;
             word-wrap: break-word;
-            animation: fadeInSimple 1s;
+        }
+
+        #reponse-back {
+            position: absolute;
+            opacity: 0.3;
+            filter: blur(10px);
+            z-index: -1;
+            transform: translate(10vw, 10vh);
         }
 
         .justify-text {
             text-align: justify;
             text-justify: inter-character;
-        }
-
-        .reponse-conteneur {
-            position: relative;
-            margin: 30vh 0px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
 
         @keyframes fadeInSimple {
@@ -86,6 +102,7 @@
             background-size: 20% 50%;
             animation: l43 1s infinite linear; 
         }
+
         @keyframes l43 {
             0%     {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
             16.67% {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
@@ -122,17 +139,6 @@
             80%,100% {transform: rotate(1turn)}
         }
 
-
-        .ombre-conteneur {
-            position: absolute;
-            opacity: 0.3;
-            filter: blur(10px);
-            z-index: -1;
-            top: 50%;
-            left: 50%;
-            transform: translate(calc(-50% + 6rem), calc(-50% + 6rem));
-        }
-
         .pointeur {
             width: 1em; 
             height: 1em; 
@@ -165,6 +171,7 @@
             margin-bottom: 2rem;
             opacity: 0.4;
             text-transform: uppercase;
+            text-align: left;
         }
 
         @keyframes fadeIn {
@@ -211,23 +218,33 @@
             transform: translateY(-50%);
         }
 
-        @media (max-width: 768px) {
-            .reponse-conteneur {
-                margin: 10vh 0px;
-            }
+        @media (max-width: 800px) {
 
             #reponse, #reponse-back {
-                font-size: 1rem;
+                font-size: 1.5rem;
             }
 
             .titre {
-                font-size: 1.5rem;
+                font-size: 1.7rem;
                 margin-bottom: 1.8rem;
             }
 
             .indent {
                 Padding-left:10px
             }
+
+            main {
+                width: calc(50vw + (800px - 100vw));
+                max-width: 90vw
+            }
+        }
+
+        .reponse-wrapper {
+            position: relative;
+            width: 100%;
+            margin: calc(20vh + 10vw) 0;
+            contain: layout; /* Empêcher les layout shifts */
+            will-change: transform;
         }
 
     </style>
@@ -237,17 +254,11 @@
     <div style="position: absolute; z-index: 999; opacity: 0;" onclick="refreshLocalisation()">Rafraichir ma position</div>
     
     <main>
-        <div class="reponse-conteneur">
+        <div class="reponse-wrapper">
+            <div id="reponse-back" class="justify-text no-select"></div>
             <div id="reponse" class=""></div>
         </div>
-
         <div class="loader no-select"></div>
-
-        <div class="ombre-conteneur">
-            <div class="reponse-conteneur no-select">
-                <div id="reponse-back" class="justify-text"></div>
-            </div>
-        </div>
     </main>
         
 
@@ -288,12 +299,14 @@
 
         function refreshLocalisation() {
             localStorage.removeItem('position');
+            localStorage.removeItem('infosVille');
             location.reload();
         }
 
         async function obtenirLocalisation() {
             // Vérifier si la géolocalisation est supportée
             if (localStorage.getItem('position')) {
+                console.log('position trouvée dans la base de données')
                 montrerPosition(JSON.parse(localStorage.getItem('position')));
                 return;
             }
@@ -325,25 +338,29 @@
         const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
         return fetch(url)
             .then((reponse) => {
-            if (!reponse.ok) {
-                throw new Error('Erreur réseau');
-            }
-            return reponse.json();
-            })
-            .then((donnes) => {
-            // Recup les informations de la ville
-            const ville = donnes.city
-            const codePostal = donnes.postcode
-            const region = donnes.principalSubdivision
-            const pays = donnes.countryName 
+                if (!reponse.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                return reponse.json();
+                })
+                .then((donnes) => {
+                // Recup les informations de la ville
+                const ville = donnes.city
+                const codePostal = donnes.postcode
+                const region = donnes.principalSubdivision
+                const pays = donnes.countryName 
 
-            // Retourner les informations de la ville
-            return {
-                ville: ville,
-                pays: pays,
-                codePostal: codePostal,
-                region: region
-            };
+                const infosVille = {
+                    ville: ville,
+                    pays: pays,
+                    codePostal: codePostal,
+                    region: region
+                };
+
+                localStorage.setItem('infosVille', JSON.stringify(infosVille));
+
+                // Retourner les informations de la ville
+                return infosVille;
             })
             .catch((erreur) => {
             console.error('Erreur lors du fetch:', erreur);
@@ -354,6 +371,12 @@
         async function montrerPosition(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
+
+            if (localStorage.getItem('infosVille')) {
+                console.log('infosVille trouvée dans la base de données')
+                envoyerRequeteApi(JSON.parse(localStorage.getItem('infosVille')));
+                return;
+            }
 
             obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
                 if (result.ville && result.pays && result.codePostal && result.region) {
@@ -455,6 +478,7 @@
                 while (true) {
 
                     const { done, value } = await reader.read();
+                    console.log(value)
                     if (done) {
                         document.querySelector('.pointeur').classList.remove('pointeur-animation');
                         setTimeout(() => {
@@ -539,6 +563,7 @@
                                     const bigEmojiElement = document.createElement('span');
                                     bigEmojiElement.textContent = newWord;
                                     bigEmojiElement.classList.add('big-emoji');
+                                    bigEmojiElement.classList.add('no-select');
                                     bigEmojiElement.style.left = "-300px";
                                     bigEmojiElement.style.transform = `rotate(${Math.random() * 120 - 60}deg)`;
 
@@ -554,10 +579,6 @@
                             }
                         } catch (parseError) {
                             console.error('Erreur lors du fetch:', parseError);
-                            await hideLoader()
-                            reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
-                            reponseEl.classList.remove('justify-text');
-                            reponseBackEl.innerHTML = ""
 
                         } finally {
                             if (isUserAtBottom) {
