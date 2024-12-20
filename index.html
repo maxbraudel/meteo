@@ -10,7 +10,47 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.png">
     <title>Weather for you</title>
+    <style>
+        spline-viewer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            animation: fadeInSimple 1.5s ease-in forwards;
+            animation-delay: 1s;
+            opacity: 0;
+        }
+
+        #logo {
+            display: none;
+        }
+
+    </style>
 </head>
+<script>
+
+    // Enlever le watermark de Spline
+
+    const loopToRemoveWatermark = setInterval(() => {
+
+        if (document.querySelector('spline-viewer')) {
+
+            const customTag = document.querySelector('spline-viewer');
+            const shadowRoot = customTag.shadowRoot;
+
+            const logo = shadowRoot.querySelector('#logo');
+            if (logo) {
+                logo.remove();
+                clearInterval(loopToRemoveWatermark);
+            }
+
+        }
+
+    }, 1);
+    
+</script>
 <body>
 
     <header>
@@ -50,6 +90,8 @@
             <div id="banner">
                 <div id="title">
                     <h1 class="no-select">weather for you&nbsp;🌞</h1>
+                    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.53/build/spline-viewer.js"></script>
+                    <spline-viewer url="https://prod.spline.design/Hoyb0HMmRGRTvTFC/scene.splinecode"></spline-viewer>
                 </div>
                 <p>Consultez la météo</p>
                 <a href="#" class="btn no-select">Accéder<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
