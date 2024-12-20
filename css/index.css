@@ -96,7 +96,6 @@ main #banner p {
 }
 
 #meteo-section, #city-section {
-    background-color: #EFEFEF;
     padding: 2.5%;
     display: flex;
     justify-content: space-around;
@@ -104,12 +103,12 @@ main #banner p {
 }
 
 #meteo-section{
-    background-color: #EFEFEF;
+    border-bottom: #EFEFEF solid 1px;
+    border-top: #EFEFEF solid 1px;
+    background-color: rgb(245, 245, 245)
 }
 
-#city-section{
-    background-color: #fff;
-}
+
 
 #meteo-section-text, #city-section-text{
     display: flex;
