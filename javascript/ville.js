@@ -50,12 +50,6 @@ async function hideLoader() {
     await delay(500);
 }
 
-function refreshLocalisation() {
-    localStorage.removeItem('position');
-    localStorage.removeItem('infosVille');
-    location.reload();
-}
-
 async function obtenirLocalisation() {
     // Vérifier si la géolocalisation est supportée
     console.log(localStorage.getItem('position'))

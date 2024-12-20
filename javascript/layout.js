@@ -16,7 +16,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Fermeture du menu mobile
     returnButton.addEventListener('click', () => {
         mobileMenu.style.display = 'none';
-        navBar.style.display = 'flex'
+        navBar.style.removeProperty('display')
     });
 
 })
+
+function refreshLocalisation() {
+    localStorage.removeItem('position');
+    localStorage.removeItem('infosVille');
+}
+
+function refreshLocalisationAndReload() {
+    localStorage.removeItem('position');
+    localStorage.removeItem('infosVille');
+    location.reload();
+}

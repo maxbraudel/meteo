@@ -26,8 +26,58 @@
 
 /* NAVIGATION MENU */
 
+.btn {
+    width: fit-content;
+    height: fit-content;
+    background-color: black;
+    color:white;
+    margin:1%;
+    padding:10px 20px;
+    border-radius: 50px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    /* prevent word wrap */
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+
+#reset-position-btn {
+    font-size: 1rem;
+    font-weight: 100;
+    background-color: rgb(236, 239, 243);
+    border: rgb(212, 212, 212) solid 1px;
+    color: black;
+    box-shadow: 0 0 0px rgba(62, 48, 124, 0.2);
+    transition: all 0.1s ease-in-out;
+}
+
+
+#reset-position-btn:hover {
+    /* shadow around the button */
+    box-shadow: 0 0 10px rgba(69, 61, 105, 0.2);
+
+}
+
+#desktop-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+#desktop-menu div {
+    display: flex;
+    align-items: center;
+    gap: 2vw
+}
+
 #return {
     cursor: pointer;
+    position: absolute;
+    right: 0;
+    margin-right: 2vw;
 }
 
 #navBar{
@@ -36,13 +86,12 @@
     width: 100%;
     z-index: 1000;
     font-size: 18px;
-    padding: 2.4rem 0;
+    height: 6rem;
     border-bottom: #EFEFEF solid 1px;
     background: linear-gradient(0deg, rgba(247,247,247,1) 0%, rgba(255,255,255,0) 100%);
-    padding-right: 8vw;
-    display: flex;
-    justify-content: flex-end;
+    padding: 0 8vw;
 }
+
 
 #navBar nav ul {
     display: flex;
@@ -80,12 +129,19 @@ ul li a {
     justify-content: space-between;
 }
 
+#desktop-bar {
+    display: none;
+    justify-content: space-between;
+}
+
 #mobile-menu ul {
     list-style-type: none;
     display: flex;
     flex-direction: column;
     gap: 1.4rem;
-    margin-left: 5%;
+    align-items: center; 
+    justify-content: center; 
+    width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -93,14 +149,14 @@ ul li a {
     #navBar{
         padding: 1.4rem 1rem;
         background: transparent;
-        border-bottom: 0px
+        border-bottom: 0px;
     }
 
     #desktop-menu {
         display: none;
     }
 
-    #mobile-menu-btn {
+    #desktop-bar, #mobile-menu-btn {
         display: flex;
     }
 }

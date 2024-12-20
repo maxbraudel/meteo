@@ -16,14 +16,21 @@
     <header>
         <div id="navBar">
             <nav id="desktop-menu">
+                <div>
+                    <img src="./img/favicon.png" height="40px" alt="logo" class="no-select">
+                    <div id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div>
+                </div>
                 <ul>
                     <li><a href="./index.html">Accueil</a></li>
                     <li><a href="#">La météo</a></li>
                     <li><a href="./ville.html">Ma ville</a></li>
                 </ul>
             </nav>
-            <div id="mobile-menu-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-justify"><path d="M3 12h18"/><path d="M3 18h18"/><path d="M3 6h18"/></svg>
+            <div id="desktop-bar">
+                <img src="./img/favicon.png" height="40px" alt="logo" class="no-select">
+                <div id="mobile-menu-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-justify"><path d="M3 12h18"/><path d="M3 18h18"/><path d="M3 6h18"/></svg>
+                </div>
             </div>
         </div>
         <div id="mobile-menu">
@@ -31,6 +38,7 @@
                 <li><a href="./index.html">Accueil</a></li>
                 <li><a href="#">La météo</a></li>
                 <li><a href="./ville.html">Ma ville</a></li>
+                <li><div id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div></li>
             </ul>
             <div id="return">
                 <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -39,7 +47,6 @@
     </header>
     
     <main>
-        <div style="position: absolute; z-index: 999; opacity: 0;" onclick="refreshLocalisation()">Rafraichir ma position</div>
         <div class="main-wrapper">
             <div class="reponse-wrapper">
                 <div id="reponse-back" class="justify-text no-select"></div>
