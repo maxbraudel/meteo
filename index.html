@@ -6,8 +6,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link preload href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/index.css">
-    <link rel="stylesheet" href="./css/layout.css">
+    <link preload rel="stylesheet" href="./css/index.css">
+    <link preload rel="stylesheet" href="./css/layout.css">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.53/build/spline-viewer.js"></script>
     <link rel="icon" type="image/x-icon" href="./img/favicon.png">
     <title>Weather for you</title>
     <style>
@@ -29,28 +30,6 @@
 
     </style>
 </head>
-<script>
-
-    // Enlever le watermark de Spline
-
-    const loopToRemoveWatermark = setInterval(() => {
-
-        if (document.querySelector('spline-viewer')) {
-
-            const customTag = document.querySelector('spline-viewer');
-            const shadowRoot = customTag.shadowRoot;
-
-            const logo = shadowRoot.querySelector('#logo');
-            if (logo) {
-                logo.remove();
-                clearInterval(loopToRemoveWatermark);
-            }
-
-        }
-
-    }, 1);
-    
-</script>
 <body>
 
     <header>
@@ -90,7 +69,6 @@
             <div id="banner">
                 <div id="title">
                     <h1 class="no-select">weather for you&nbsp;🌞</h1>
-                    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.53/build/spline-viewer.js"></script>
                     <spline-viewer url="https://prod.spline.design/Hoyb0HMmRGRTvTFC/scene.splinecode"></spline-viewer>
                 </div>
                 <p>Consultez la météo</p>
@@ -121,5 +99,27 @@
             </div>
     </main>
     <script src="./javascript/layout.js"></script> 
+    <script>
+
+        // Enlever le watermark de Spline
+    
+        const loopToRemoveWatermark = setInterval(() => {
+    
+            if (document.querySelector('spline-viewer')) {
+    
+                const customTag = document.querySelector('spline-viewer');
+                const shadowRoot = customTag.shadowRoot;
+    
+                const logo = shadowRoot.querySelector('#logo');
+                if (logo) {
+                    logo.remove();
+                    clearInterval(loopToRemoveWatermark);
+                }
+    
+            }
+    
+        }, 1);
+        
+    </script>
 </body>
 </html>
