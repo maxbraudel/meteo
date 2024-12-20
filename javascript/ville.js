@@ -51,9 +51,8 @@ async function hideLoader() {
 }
 
 function refreshLocalisation() {
-    localStorage.setItem('position', null);
-    localStorage.setItem('infosVille', null);
-    localStorage.clear();
+    localStorage.removeItem('position');
+    localStorage.removeItem('infosVille');
     location.reload();
 }
 
