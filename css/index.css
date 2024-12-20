@@ -101,6 +101,15 @@ main #banner p {
     white-space: nowrap;
 }
 
+.btn svg {
+    transform: translateX(0);
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn:hover svg {
+    transform: translateX(3px);
+}
+
 #meteo-section, #city-section {
     background-color: #EFEFEF;
     padding: 2.5%;

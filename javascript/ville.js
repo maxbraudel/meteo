@@ -51,8 +51,9 @@ async function hideLoader() {
 }
 
 function refreshLocalisation() {
-    localStorage.removeItem('position');
-    localStorage.removeItem('infosVille');
+    localStorage.setItem('position', null);
+    localStorage.setItem('infosVille', null);
+    localStorage.clear();
     location.reload();
 }
 
@@ -88,7 +89,7 @@ async function obtenirLocalisation() {
     }
 }
 
-function obtenirVilleLaPlusProche(lat, lon) {
+async function obtenirVilleLaPlusProche(lat, lon) {
 // Url de l'API de Nominatim
 const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
 return fetch(url)
