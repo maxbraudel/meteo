@@ -13,6 +13,9 @@
 
 img{
     display: block;
+    pointer-events: none; /* Prevent interaction like dragging */
+    user-select: none; /* Prevent text selection for the image alt text */
+    -webkit-user-drag: none;
 }
 
 p, a {
