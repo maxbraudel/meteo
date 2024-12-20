@@ -4,301 +4,51 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link preload href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/ville.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test générateur IA</title>
-    <style>
-
-        html, body {
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            overflow-anchor: none; /* Empêcher les layout shifts */
-        }
-
-        .no-select {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            /* desactiver le drag and drop */
-            -webkit-user-drag: none;
-            -khtml-user-drag: none;
-            -moz-user-drag: none;
-            -o-user-drag: none;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            
-        }
-
-        main {
-            height: 100%;
-            width: 50vw;
-            max-width: 700px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .reponse-container {
-            padding: 10vw 0;
-            position: relative;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-        }
-
-        .disable-scroll {
-            -ms-overflow-style: none;  
-            scrollbar-width: none;
-        }
-        .disable-scroll::-webkit-scrollbar { 
-            display: none;
-        }
-
-        #reponse, #reponse-back {
-            width: 100%;
-            box-sizing: border-box;
-            font-family: "Inter", sans-serif;
-            line-height: 1.2;
-            font-style: normal;
-            font-size: 1.7rem;
-            font-weight: 500;
-            color: #333;
-            word-wrap: break-word;
-        }
-
-        #reponse-back {
-            position: absolute;
-            opacity: 0.3;
-            filter: blur(10px);
-            z-index: -1;
-            transform: translate(100px, 100px);
-        }
-
-        .justify-text {
-            text-align: justify;
-            text-justify: inter-character;
-        }
-
-        @keyframes fadeInSimple {
-            0% {opacity: 0;}
-            100% {opacity: 1;}
-        }
-
-        .loader-stage-1 {
-            height: 30px;
-            aspect-ratio: 2.5;
-            --_g: no-repeat radial-gradient(farthest-side, #000 90%, #0000);
-            background: var(--_g), var(--_g), var(--_g), var(--_g);
-            background-size: 20% 50%;
-            animation: l43 1s infinite linear; 
-        }
-
-        @keyframes l43 {
-            0%     {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-            16.67% {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-            33.33% {background-position: calc(0*100%/3) 100%,calc(1*100%/3) 0   ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-            50%    {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 50% }
-            66.67% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 100%,calc(3*100%/3) 0   }
-            83.33% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 100%}
-            100%   {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-        }
-
-        .loader-stage-2 {
-            width: 80px;
-            height: 40px;
-            border-radius: 100px 100px 0 0;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInSimple 1s;
-        }
-        .loader-stage-2::before {
-            content: "";
-            position: absolute;
-            inset: 0 0 -100%;
-            background: 
-                radial-gradient(farthest-side,#ffd738 80%,#0000) left 70% top    20%/15px 15px,
-                radial-gradient(farthest-side,#020308 92%,#0000) left 65% bottom 19%/12px 12px,
-                radial-gradient(farthest-side,#ecfefe 92%,#0000) left 70% bottom 20%/15px 15px,
-                linear-gradient(#9eddfe 50%,#020308 0);
-            background-repeat: no-repeat;
-            animation: l5 2s infinite;
-            }
-            @keyframes l5 {
-            0%,20%   {transform: rotate(0)}
-            40%,60%  {transform: rotate(.5turn)}
-            80%,100% {transform: rotate(1turn)}
-        }
-
-        .pointeur {
-            width: 1em; 
-            height: 1em; 
-            vertical-align: middle;
-            transform: scale(0);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
-        }
-
-        .word {
-            position: relative;
-            top: 7px;
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.37, 0.57, 0.44, 0.9);
-        }
-
-        .pointeur-animation {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .word-animation {
-            top: 0px;
-            opacity: 1;
-        }
-
-        .titre {
-            font-size: 1.8rem;
-            animation: fadeIn 1s;
-            margin-bottom: 2rem;
-            opacity: 0.4;
-            text-transform: uppercase;
-            text-align: left;
-        }
-
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            100% {
-                opacity: 0.4;
-                transform: translateX(0);
-            }
-        }
-
-        br {
-            margin-left: 100px;
-        }
-
-        
-        .indent {
-            Padding-left:60px
-        }
-
-        /* center loader on the page */
-
-        .loader {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            z-index: 2;
-        }
-
-        .show-loader {
-            opacity: 1;
-        }
-
-        .big-emoji {
-            font-size: 7rem;
-            filter: blur(7px);
-            opacity: 0.5;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        @media (max-width: 800px) {
-
-            #reponse, #reponse-back {
-                font-size: 1.5rem;
-            }
-
-            .titre {
-                font-size: 1.7rem;
-                margin-bottom: 1.8rem;
-            }
-
-            .indent {
-                Padding-left:10px
-            }
-
-            main {
-                width: calc(50vw + (800px - 100vw));
-                max-width: 80vw
-            }
-        }
-
-        .reponse-wrapper {
-            position: relative;
-            width: 100%;
-            margin: calc(20vh + 10vw) 0;
-            contain: layout; /* Empêcher les layout shifts */
-            will-change: transform;
-        }
-
-        .alert {
-            z-index: 1;
-            text-align: center;
-            width: 100%;
-            padding: 10px 20px;
-            color: #333;
-            backdrop-filter: blur(10px);
-            font-size: 1rem;
-            font-family: "Inter", sans-serif;
-            font-weight: 200;
-            text-transform:uppercase;
-            position: fixed;
-            top: 55%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-        }
-
-        .alert p {
-            animation: flash 0.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes flash {
-            from {
-                opacity: 0.5;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .show-alert {
-            opacity: 1;
-        }
-
-    </style>
+    <title>Weather for you 🌤 - Ma Ville</title>
 </head>
 <body>
 
     <div style="position: absolute; z-index: 999; opacity: 0;" onclick="refreshLocalisation()">Rafraichir ma position</div>
+
+    <header>
+        <div id="navBar">
+            <nav id="desktop-menu">
+                <ul>
+                    <li><a href="./index.html">Accueil</a></li>
+                    <li><a href="#">La météo</a></li>
+                    <li><a href="./ville.html">Ma ville</a></li>
+                </ul>
+            </nav>
+            <div id="mobile-menu-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-justify"><path d="M3 12h18"/><path d="M3 18h18"/><path d="M3 6h18"/></svg>
+            </div>
+        </div>
+        <div id="mobile-menu">
+            <ul>
+                <li><a href="./index.html">Accueil</a></li>
+                <li><a href="#">La météo</a></li>
+                <li><a href="./ville.html">Ma ville</a></li>
+            </ul>
+            <div id="return">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+        </div>
+    </header>
     
     <main>
-        <div class="reponse-wrapper">
-            <div id="reponse-back" class="justify-text no-select"></div>
-            <div id="reponse" class=""></div>
-        </div>
-        <div class="loader no-select"></div>
-        <div class="alert no-select">
-            <p></p>
+        <div class="main-wrapper">
+            <div class="reponse-wrapper">
+                <div id="reponse-back" class="justify-text no-select"></div>
+                <div id="reponse" class=""></div>
+            </div>
+            <div class="loader no-select"></div>
+            <div class="alert no-select">
+                <p></p>
+            </div>
         </div>
     </main>
         
@@ -728,12 +478,13 @@
             // Tester si l'utilisateur est au bas de la page
             const scrollPosition = window.scrollY + window.innerHeight;
             // La valeur de threshold est calculée en fonction de la taille de la scrollbar
-            const threshold = 17; 
+            const threshold = 15; 
             const bottomPosition = document.documentElement.scrollHeight;
 
             return scrollPosition >= bottomPosition - threshold;
         }
 
     </script>
+    <script src="./layout.js"></script>
 </body>
 </html>

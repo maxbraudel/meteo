@@ -1,0 +1,106 @@
+/* GENERAL */
+
+*{
+    margin:0;
+    padding:0;
+    font-family: "Inter", sans-serif;
+}
+
+*, *::after, *::before {
+    box-sizing: border-box;
+}
+
+.no-select, header {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* desactiver le drag and drop */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+}
+
+/* NAVIGATION MENU */
+
+#return {
+    cursor: pointer;
+}
+
+#navBar{
+    position: absolute;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    font-size: 18px;
+    padding: 2.4rem 0;
+    border-bottom: #EFEFEF solid 1px;
+    background: linear-gradient(0deg, rgba(247,247,247,1) 0%, rgba(255,255,255,0) 100%);
+    padding-right: 8vw;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#navBar nav ul {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6vw;
+}
+
+#navBar nav ul li {
+    list-style-type: none;
+}
+
+#navBar ul li a {
+    text-decoration: none;
+    color: black;
+}
+
+#mobile-menu-btn {
+    display: none; 
+    cursor: pointer;
+}
+
+#mobile-menu {
+    display: none;
+    position: fixed;
+    border-bottom: #EFEFEF solid 1px;
+    backdrop-filter: blur(10px);
+    background: rgb(247,247,247);
+    background: linear-gradient(0deg, rgba(247,247,247,1) 0%, rgba(255,255,255,0) 100%);
+    top: 0;
+    right: 0;
+    width: 100%;
+    padding: 1.4rem 1rem;
+    z-index: 1000;
+    justify-content: space-between;
+}
+
+#mobile-menu ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    margin-left: 5%;
+}
+
+@media (max-width: 768px) {
+
+    #navBar{
+        padding: 1.4rem 1rem;
+        background: transparent;
+        border-bottom: 0px
+    }
+
+    #desktop-menu {
+        display: none;
+    }
+
+    #mobile-menu-btn {
+        display: flex;
+    }
+}
