@@ -35,21 +35,36 @@
     </header>
 
     <main>
-        <h2>La ville</h2>
+        <h2 class="city">La ville</h2>
         <div id="meteo-section-img">
             <img src="img/soleil.png" alt="image d'un soleil">
         </div>
-        <p><strong>Température : </strong><span>20 C</span></p>
-        <p><strong>Humidité : </strong><span>3%</span></p>
+        <p><strong>Température : </strong></p>
+            <p class = "temp">20°C</p>
+        <p><strong>Humidité : </strong></p>
+            <p class="hum">3%</p>
         </div>
     </main>
 
     <script>
     
-    const apiKey = "";
-    const apiUrl = "";
-
-    </script>
+        const apiKey = "54ab11de1bb7acd090d2f9fc9ac734cb ";
+        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=barcelona";
+    
+        async function checkWeather() {
+            const response = await fetch(apiUrl + `&appid=${apiKey}`);
+            var data = await response.json();
+    
+            console.log(data);
+    
+            document.querySelector(".city").innerHTML = data.name; 
+            document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C"; 
+            document.querySelector(".hum").innerHTML = data.main.humidity + "%"; 
+    
+        }
+    
+        checkWeather();  
+         </script>
 
 </body>
 </html>
