@@ -82,6 +82,31 @@ async function obtenirLocalisation() {
     }
 }
 
+async function getWeatherByCoordinates(lat, lon) {
+    const apiKey = 'a27d442453213cecadd12d84e1c3fe77';
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Error fetching weather: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return {
+            location: data.name,
+            temperature: data.main.temp,
+            description: data.weather[0].description,
+            humidity: data.main.humidity,
+            windSpeed: data.wind.speed,
+        };
+    } catch (error) {
+        console.error('Error fetching weather data:', error.message);
+        return { error: error.message };
+    }
+}
+
 async function obtenirVilleLaPlusProche(lat, lon) {
 // Url de l'API de Nominatim
 const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
@@ -123,16 +148,62 @@ async function montrerPosition(position) {
 
     if (localStorage.getItem('infosVille') && JSON.parse(localStorage.getItem('infosVille')).ville) {
         console.log('infosVille trouvée dans la base de données')
-        envoyerRequeteApi(JSON.parse(localStorage.getItem('infosVille')));
+        
+        const localizationDatas = JSON.parse(localStorage.getItem('infosVille'))
+
+        getWeatherByCoordinates(latitude, longitude).then((weathersDatas) => {
+
+            if (weathersDatas.error) {
+                console.error('Error fetching weather data:', weathersDatas.error);
+                (async () => {
+
+                    const reponseEl = document.getElementById('reponse');
+                    await hideLoader()
+                    reponseEl.style.textAlign = 'center';
+                    reponseEl.textContent = "L'API météo est indisponible.";
+        
+                })
+            } else {
+                const result = { localizationDatas, weathersDatas };
+                console.log(JSON.stringify(result))
+                envoyerRequeteApi(result);
+            }
+
+        })
         return;
     }
 
-    obtenirVilleLaPlusProche(latitude, longitude).then((result) => {
-        if (result.ville && result.pays && result.codePostal && result.region) {
-            envoyerRequeteApi(result);
+    obtenirVilleLaPlusProche(latitude, longitude).then((localizationDatas) => {
+        if (localizationDatas.ville && localizationDatas.pays && localizationDatas.codePostal && localizationDatas.region) {
+            getWeatherByCoordinates(latitude, longitude).then((weathersDatas) => {
+
+                if (weathersDatas.error) {
+                    console.error('Error fetching weather data:', weathersDatas.error);
+                    (async () => {
+
+                        const reponseEl = document.getElementById('reponse');
+                        await hideLoader()
+                        reponseEl.style.textAlign = 'center';
+                        reponseEl.textContent = "L'API météo est indisponible.";
+            
+                    })
+                } else {
+                    const result = { localizationDatas, weathersDatas };
+                    console.log(JSON.stringify(result))
+                    envoyerRequeteApi(result);
+                }
+
+            })
         } else {
+
+            (async () => {
+
             const reponseEl = document.getElementById('reponse');
+            await hideLoader()
+            reponseEl.style.textAlign = 'center';
             reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
+
+            })
         }
     });
 
@@ -177,11 +248,24 @@ async function envoyerRequeteApi(inputObject) {
         showAlert('Cela peut prendre un moment')
     }, 10000)
 
+    const localizationDatas = inputObject.localizationDatas
+    const weathersDatas = inputObject.weathersDatas
+
+    // convert all numbers to string with comma separator
+    weathersDatas.temperature = weathersDatas.temperature.toString().replace('.', ',')
+    weathersDatas.humidity = weathersDatas.humidity.toString().replace('.', ',')
+    weathersDatas.windSpeed = weathersDatas.windSpeed.toString().replace('.', ',')
+
     // const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}. (emojis)`;
     const message = `
-        Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ?.
-        Informations sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}.
-        Commence à introduire la ville en une phrase puis rédige une liste ordonnée d'activités détaillées en lien avec des lieux connus propres à la ville ou à ses alentours..
+        Que peut-on faire dans la ville de ${localizationDatas.ville} et ses alentours ?.
+        Tu dois proposer un parcours adapté aux conditions météorologiques du jour.
+        Information météorologiques : température : ${weathersDatas.temperature}°C, humidité : ${weathersDatas.humidity}%, vent : ${weathersDatas.windSpeed}km/h.
+        Informations sur la ville : code postal : ${localizationDatas.codePostal}, région : ${localizationDatas.region}, pays : ${localizationDatas.pays}.
+        Commence à introduire la ville en une phrase et la météo du jour, puis rédige une liste ordonnée d'activités détaillées que l'on peut faire d'après les données météo, en lien avec des lieux connus propres à la ville ou à ses alentours..
+        Utilise la virgule plutôt que le point pour marquer les décimales dans les chiffres.
+        Exemple de notation interdite pour un nombre : 1.4
+        Exemple de notation autorisée pour un nombre : 1,4
         Ajoute un emoji au tout début de chaque activité dans la liste. 
         Les emojis doivent être variés et illustrent les activités.
         Modèle de paragraphe dans la liste : {numéro}. {emoji} {nom de l'activité} : {description détaillée}. 
@@ -223,7 +307,7 @@ async function envoyerRequeteApi(inputObject) {
             // Replace every hyphen "-" with a hyphen followed by the WORD JOINER "\u2060"
             return input.replace(/-/g, '-\u2060');
         }
-        const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${lierLesTiretsDansUnString(inputObject.ville)}</div>${pointeurIconElement}`
+        const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${lierLesTiretsDansUnString(localizationDatas.ville)}</div>${pointeurIconElement}`
 
         reponseEl.innerHTML = baseContent
         reponseBackEl.innerHTML = baseContent

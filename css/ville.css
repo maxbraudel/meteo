@@ -205,15 +205,17 @@ br {
         margin-bottom: 1.8rem;
     }
 
-    .indent {
-        Padding-left:10px
-    }
-
     .main-wrapper {
         width: calc(50vw + (800px - 100vw));
         max-width: 80vw
     }
 }
+
+@media (max-width: 476px) {
+    .indent {
+        Padding-left:10vw
+    }
+}   
 
 .reponse-wrapper {
     position: relative;
@@ -230,6 +232,7 @@ br {
     padding: 10px 20px;
     color: #333;
     backdrop-filter: blur(10px);
+    margin-top: 10px;
     font-size: 1rem;
     font-weight: 200;
     text-transform:uppercase;
