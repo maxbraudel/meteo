@@ -25,6 +25,10 @@ main {
     height: 100vh;
 }
 
+.main-wrapper {
+    display: none;
+}
+
 main h2 {
     font-size: 32px;
     margin-bottom: 20px;
@@ -34,12 +38,12 @@ main h2 {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 80px 0;
 }
 
 #meteo-section-img img {
     max-width: 100%; 
     height: auto;
+    display: none;
 }
 
 @media (max-width: 768px) {
@@ -50,4 +54,23 @@ main h2 {
     #meteo-section-img{
         margin: 10%;
     }
+
+}
+
+.show {
+    display: block !important;
+}
+
+#reponse {
+    font-size: 1.7rem;
+    font-weight: 500;
+    max-width: 600px;
+}
+
+@media (max-width: 800px) {
+
+    #reponse {
+        font-size: 1.5rem;
+    }
+
 }

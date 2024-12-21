@@ -31,3 +31,27 @@ function refreshLocalisationAndReload() {
     localStorage.removeItem('infosVille');
     location.reload();
 }
+
+/* FUNCTIONS */
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/* LOADER ELEMENTS */
+
+function showLoader(stage) {
+    const loadingEl = document.querySelector('.loader');
+
+    setTimeout(() => {
+        loadingEl.classList.add('show-loader');
+    }, 1);
+
+    if (stage === 1) {
+        loadingEl.classList.remove('loader-stage-2');
+        loadingEl.classList.add('loader-stage-1');
+    } else if (stage === 2) {
+        loadingEl.classList.remove('loader-stage-1');
+        loadingEl.classList.add('loader-stage-2');
+    }
+}

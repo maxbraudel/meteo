@@ -69,51 +69,6 @@ main {
     100% {opacity: 1;}
 }
 
-.loader-stage-1 {
-    height: 30px;
-    aspect-ratio: 2.5;
-    --_g: no-repeat radial-gradient(farthest-side, #000 90%, #0000);
-    background: var(--_g), var(--_g), var(--_g), var(--_g);
-    background-size: 20% 50%;
-    animation: l43 1s infinite linear; 
-}
-
-@keyframes l43 {
-    0%     {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-    16.67% {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-    33.33% {background-position: calc(0*100%/3) 100%,calc(1*100%/3) 0   ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-    50%    {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 50% }
-    66.67% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 100%,calc(3*100%/3) 0   }
-    83.33% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 100%}
-    100%   {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-}
-
-.loader-stage-2 {
-    width: 80px;
-    height: 40px;
-    border-radius: 100px 100px 0 0;
-    position: relative;
-    overflow: hidden;
-    animation: fadeInSimple 1s;
-}
-.loader-stage-2::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 -100%;
-    background: 
-        radial-gradient(farthest-side,#ffd738 80%,#0000) left 70% top    20%/15px 15px,
-        radial-gradient(farthest-side,#020308 92%,#0000) left 65% bottom 19%/12px 12px,
-        radial-gradient(farthest-side,#ecfefe 92%,#0000) left 70% bottom 20%/15px 15px,
-        linear-gradient(#9eddfe 50%,#020308 0);
-    background-repeat: no-repeat;
-    animation: l5 2s infinite;
-    }
-    @keyframes l5 {
-    0%,20%   {transform: rotate(0)}
-    40%,60%  {transform: rotate(.5turn)}
-    80%,100% {transform: rotate(1turn)}
-}
-
 .pointeur {
     width: 1em; 
     height: 1em; 
@@ -170,20 +125,6 @@ br {
 }
 
 /* center loader on the page */
-
-.loader {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    z-index: 2;
-}
-
-.show-loader {
-    opacity: 1;
-}
 
 .big-emoji {
     font-size: 7rem;

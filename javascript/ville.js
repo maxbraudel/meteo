@@ -1,23 +1,3 @@
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function showLoader(stage) {
-    const loadingEl = document.querySelector('.loader');
-
-    setTimeout(() => {
-        loadingEl.classList.add('show-loader');
-    }, 1);
-
-    if (stage === 1) {
-        loadingEl.classList.remove('loader-stage-2');
-        loadingEl.classList.add('loader-stage-1');
-    } else if (stage === 2) {
-        loadingEl.classList.remove('loader-stage-1');
-        loadingEl.classList.add('loader-stage-2');
-    }
-}
-
 function showAlert(message) {
     const alertEl = document.querySelector('.alert');
     const alertTextEl = alertEl.querySelector('p');
@@ -36,9 +16,10 @@ async function hideAlert() {
     await delay(500);
 }
 
-
 async function hideLoader() {
+
     hideAlert()
+
     const loadingEl = document.querySelector('.loader');
     loadingEl.classList.remove('show-loader');
     setTimeout(() => {
