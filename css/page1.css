@@ -74,3 +74,15 @@ main h2 {
     }
 
 }
+
+.ranger{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ligne {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
