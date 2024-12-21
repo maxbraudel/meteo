@@ -4,52 +4,65 @@ const apiKey = "54ab11de1bb7acd090d2f9fc9ac734cb ";
 
 async function checkWeather(coordonnees) {
 
-    const mainWrapper = document.querySelector('.main-wrapper');
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${coordonnees.latitude}&lon=${coordonnees.longitude}&appid=${apiKey}`;
 
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${coordonnees.latitude}&lon=${coordonnees.longitude}`;
-
-    const response = await fetch(apiUrl + `&appid=${apiKey}`);
-    var data = await response.json();
-
-    console.log(data);
-
-    const infosVille = await obtenirVilleLaPlusProche(coordonnees.latitude, coordonnees.longitude);
-
-    if (infosVille.ville !== null) {
-
-        document.querySelector(".city").innerHTML = infosVille.ville; 
-        document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C"; 
-        document.querySelector(".hum").innerHTML = data.main.humidity + "%"; 
-
-        const weatherIconId = data.weather[0].icon;
-
-        if (weatherIconId.includes("01")) {
-            document.querySelector("#clear-sky").classList.add("show");
-        } else if (weatherIconId.includes("02")) {
-            document.querySelector("#few-clouds").classList.add("show");
-        } else if (weatherIconId.includes("03")) {
-            document.querySelector("#broken-clouds").classList.add("show");
-        } else if (weatherIconId.includes("04")) {
-            document.querySelector("#scattered-clouds").classList.add("show");
-        } else if (weatherIconId.includes("09")) {
-            document.querySelector("#shower-rain").classList.add("show");
-        } else if (weatherIconId.includes("10")) {
-            document.querySelector("#rain").classList.add("show");
-        } else if (weatherIconId.includes("11")) {
-            document.querySelector("#snow").classList.add("show");
-        } else if (weatherIconId.includes("13")) {
-            document.querySelector("#thunderstorm").classList.add("show");
+    return fetch(apiUrl)
+    .then(async (response) => {
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        hideLoader()
-        mainWrapper.classList.add('show');
+        const mainWrapper = document.querySelector('.main-wrapper');
+        
+        const data = await response.json();
+
+        const infosVille = await obtenirVilleLaPlusProche(coordonnees.latitude, coordonnees.longitude);
+
+        if (infosVille.ville !== null) {
+
+            document.querySelector(".city").innerHTML = infosVille.ville; 
+            document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C"; 
+            document.querySelector(".hum").innerHTML = data.main.humidity + "%"; 
+
+            const weatherIconId = data.weather[0].icon;
+
+            if (weatherIconId.includes("01")) {
+                document.querySelector("#clear-sky").classList.add("show");
+            } else if (weatherIconId.includes("02")) {
+                document.querySelector("#few-clouds").classList.add("show");
+            } else if (weatherIconId.includes("03")) {
+                document.querySelector("#broken-clouds").classList.add("show");
+            } else if (weatherIconId.includes("04") || weatherIconId.includes("50")) {
+                document.querySelector("#scattered-clouds").classList.add("show");
+            } else if (weatherIconId.includes("09")) {
+                document.querySelector("#shower-rain").classList.add("show");
+            } else if (weatherIconId.includes("10")) {
+                document.querySelector("#rain").classList.add("show");
+            } else if (weatherIconId.includes("11")) {
+                document.querySelector("#snow").classList.add("show");
+            } else if (weatherIconId.includes("13")) {
+                document.querySelector("#thunderstorm").classList.add("show");
+            }
+
+            hideLoader()
+            mainWrapper.classList.add('show');
+        
+        } else {
+            console.log(".")
+            hideLoader()
+            const reponseEl = document.getElementById('reponse');
+            reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
+        }
     
-    } else {
-        console.log(".")
+    })
+    .catch (error => {
+        console.error('Erreur lors de la récupération de la météo:', error);
         hideLoader()
         const reponseEl = document.getElementById('reponse');
-        reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
-    }
+        reponseEl.textContent = "L'API météo est indisponible.";
+        testerUrlAPIEtReloadSiDisponible(apiUrl, 1000, response => response.ok);
+    })
 
 }
 

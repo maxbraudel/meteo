@@ -32,19 +32,10 @@ async function hideLoader() {
 }
 
 async function obtenirLocalisation() {
-    // Vérifier si la géolocalisation est supportée
-    console.log(localStorage.getItem('position'))
-    if  (localStorage.getItem('position') && JSON.parse(localStorage.getItem('position')).coords.latitude) {
-        console.log('position trouvée dans la base de données')
-        montrerPosition(JSON.parse(localStorage.getItem('position')));
-        console.log(localStorage.getItem('position'))
-        return;
-    }
-    showLoader(1)
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                localStorage.setItem('position', JSON.stringify(position));
                 // montrer un nouveau loader pendant la géolocalisation
                 montrerPosition(position);
             }, 
@@ -67,11 +58,10 @@ async function getWeatherByCoordinates(lat, lon) {
     const apiKey = 'a27d442453213cecadd12d84e1c3fe77';
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
-    try {
-        const response = await fetch(url);
-
+    return fetch(url)
+    .then(async (response) => {
         if (!response.ok) {
-            throw new Error(`Error fetching weather: ${response.statusText}`);
+            throw new Error(response.statusText);
         }
 
         const data = await response.json();
@@ -81,21 +71,29 @@ async function getWeatherByCoordinates(lat, lon) {
             description: data.weather[0].description,
             humidity: data.main.humidity,
             windSpeed: data.wind.speed,
-        };
-    } catch (error) {
-        console.error('Error fetching weather data:', error.message);
-        return { error: error.message };
-    }
+        }
+    })
+    .catch(async (erreur) => {
+        console.error('Erreur lors de la récupération de la météo:', erreur);
+        testerUrlAPIEtReloadSiDisponible(url, 1000, response => response.ok);
+        const reponseEl = document.getElementById('reponse');
+        await hideLoader()
+        reponseEl.style.textAlign = 'center';
+        reponseEl.textContent = "L'API météo est indisponible.";
+
+    })
 }
 
 async function obtenirVilleLaPlusProche(lat, lon) {
-// Url de l'API de Nominatim
-const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
-return fetch(url)
+    // Url de l'API de Nominatim
+    const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
+    
+    return fetch(url)
     .then((reponse) => {
         if (!reponse.ok) {
-            throw new Error('Erreur réseau');
+            throw new Error(reponse.statusText);
         }
+
         return reponse.json();
         })
         .then((donnes) => {
@@ -112,14 +110,22 @@ return fetch(url)
             region: region
         };
 
-        localStorage.setItem('infosVille', JSON.stringify(infosVille));
-
         // Retourner les informations de la ville
         return infosVille;
     })
-    .catch((erreur) => {
-    console.error('Erreur lors du fetch:', erreur);
-    return { ville: null, country: null, postCode: null, region: null };
+    .catch(async (erreur) => {
+
+        console.error('Erreur lors de la récupération de la ville:', erreur);
+
+        const reponseEl = document.getElementById('reponse');
+        await hideLoader()
+        reponseEl.style.textAlign = 'center';
+        reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
+
+        testerUrlAPIEtReloadSiDisponible(url, 1000, response => response.ok);
+
+
+        return { ville: null, country: null, postCode: null, region: null };
     });
 }
 
@@ -127,62 +133,14 @@ async function montrerPosition(position) {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
 
-    if (localStorage.getItem('infosVille') && JSON.parse(localStorage.getItem('infosVille')).ville) {
-        console.log('infosVille trouvée dans la base de données')
-        
-        const localizationDatas = JSON.parse(localStorage.getItem('infosVille'))
-
-        getWeatherByCoordinates(latitude, longitude).then((weathersDatas) => {
-
-            if (weathersDatas.error) {
-                console.error('Error fetching weather data:', weathersDatas.error);
-                (async () => {
-
-                    const reponseEl = document.getElementById('reponse');
-                    await hideLoader()
-                    reponseEl.style.textAlign = 'center';
-                    reponseEl.textContent = "L'API météo est indisponible.";
-        
-                })
-            } else {
-                const result = { localizationDatas, weathersDatas };
-                console.log(JSON.stringify(result))
-                envoyerRequeteApi(result);
-            }
-
-        })
-        return;
-    }
-
     obtenirVilleLaPlusProche(latitude, longitude).then((localizationDatas) => {
         if (localizationDatas.ville && localizationDatas.pays && localizationDatas.codePostal && localizationDatas.region) {
             getWeatherByCoordinates(latitude, longitude).then((weathersDatas) => {
 
-                if (weathersDatas.error) {
-                    console.error('Error fetching weather data:', weathersDatas.error);
-                    (async () => {
-
-                        const reponseEl = document.getElementById('reponse');
-                        await hideLoader()
-                        reponseEl.style.textAlign = 'center';
-                        reponseEl.textContent = "L'API météo est indisponible.";
-            
-                    })
-                } else {
+                if (weathersDatas) {
                     const result = { localizationDatas, weathersDatas };
-                    console.log(JSON.stringify(result))
                     envoyerRequeteApi(result);
                 }
-
-            })
-        } else {
-
-            (async () => {
-
-            const reponseEl = document.getElementById('reponse');
-            await hideLoader()
-            reponseEl.style.textAlign = 'center';
-            reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
 
             })
         }
@@ -218,7 +176,10 @@ async function montrerErreursGeolocalisation(erreur) {
 }
 
 // si le dom est chargé on lance la géolocalisation
-document.addEventListener('DOMContentLoaded', obtenirLocalisation);        
+document.addEventListener('DOMContentLoaded', () => {
+    showLoader(1)
+    obtenirLocalisation()
+})
 
 async function envoyerRequeteApi(inputObject) {
 
@@ -338,8 +299,6 @@ async function envoyerRequeteApi(inputObject) {
                 const isUserAtBottom = testIfUserIsAtBottom();
 
                 try {
-                    // Parse le JSON de la réponse
-                    console.log(line)
 
                     const parsedLine = JSON.parse(line);
                     if (parsedLine.response) {
@@ -423,7 +382,7 @@ async function envoyerRequeteApi(inputObject) {
                         }, 1)
                     }
                 } catch (parseError) {
-                    console.error('Erreur lors du fetch:', parseError);
+                    console.error('Erreur lors du fetch du token IA:', parseError);
                                             
                     allPointers.forEach(pointeur => {
                         pointeur.classList.remove('pointeur-animation')    
@@ -448,8 +407,10 @@ async function envoyerRequeteApi(inputObject) {
         }
     } catch (erreur) {
         console.error('Erreur lors du fetch:', erreur);
+        clearTimeout(alertTimeOut)
         await hideLoader()
-        reponseEl.innerHTML = "L'API est inacessible, veuillez réessayer plus tard.";
+        reponseEl.innerHTML = "L'API Ollama est inacessible, veuillez réessayer plus tard.";
+        testerUrlAPIEtReloadSiDisponible('https://ollama.maxbraudel.com/api/generate', 1000, response => response.body.getReader());
         reponseEl.classList.remove('justify-text');
         reponseEl.style.textAlign = 'center';
         reponseBackEl.innerHTML = "";
