@@ -13,7 +13,7 @@ async function checkWeather(coordonnees) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const mainWrapper = document.querySelector('.main-wrapper');
+        const mainWrapper = document.querySelector('.meteo-section');
         
         const data = await response.json();
 
@@ -28,23 +28,46 @@ async function checkWeather(coordonnees) {
 
             const weatherIconId = data.weather[0].icon;
 
+            let iconeMeteoChoisie
+
             if (weatherIconId.includes("01")) {
-                document.querySelector("#clear-sky").classList.add("show");
+                iconeMeteoChoisie = document.querySelector("#clear-sky")
+                document.querySelector("h1").textContent = "ensoleillé"
             } else if (weatherIconId.includes("02")) {
-                document.querySelector("#few-clouds").classList.add("show");
+                iconeMeteoChoisie = document.querySelector("#few-clouds")
+                document.querySelector("h1").textContent = "partiellement nuageux"
             } else if (weatherIconId.includes("03")) {
-                document.querySelector("#broken-clouds").classList.add("show");
-            } else if (weatherIconId.includes("04") || weatherIconId.includes("50")) {
-                document.querySelector("#scattered-clouds").classList.add("show");
+                iconeMeteoChoisie = document.querySelector("#broken-clouds")
+                document.querySelector("h1").textContent = "couvert"
+            } else if (weatherIconId.includes("04")) {
+                iconeMeteoChoisie = document.querySelector("#scattered-clouds")
+                document.querySelector("h1").textContent = "nuageux"
             } else if (weatherIconId.includes("09")) {
-                document.querySelector("#shower-rain").classList.add("show");
+                iconeMeteoChoisie = document.querySelector("#shower-rain")
+                document.querySelector("h1").textContent = "pluie abondante"
             } else if (weatherIconId.includes("10")) {
-                document.querySelector("#rain").classList.add("show");
+                iconeMeteoChoisie = document.querySelector("#rain")
+                document.querySelector("h1").textContent = "pluie"
             } else if (weatherIconId.includes("11")) {
-                document.querySelector("#snow").classList.add("show");
+                iconeMeteoChoisie = document.querySelector("#snow")
+                document.querySelector("h1").textContent = "neige"
             } else if (weatherIconId.includes("13")) {
-                document.querySelector("#thunderstorm").classList.add("show");
+                iconeMeteoChoisie = document.querySelector("#thunderstorm")
+                document.querySelector("h1").textContent = "orage"
+            } else if (weatherIconId.includes("50")) {
+                iconeMeteoChoisie = document.querySelector("#scattered-clouds")
+                document.querySelector("h1").textContent = "brouillard"
             }
+
+            const allIcons = document.querySelectorAll('#meteo-section-img > img')
+            allIcons.forEach(icon => {
+                icon.classList.remove('show')
+            })
+            iconeMeteoChoisie.classList.add("show");
+
+            // change favicon to the src of the element which
+            const favicon = iconeMeteoChoisie.src
+            document.querySelector('link[rel="icon"]').href = favicon
 
             hideLoader()
             mainWrapper.classList.add('show');
@@ -73,6 +96,9 @@ async function obtenirLocalisation() {
         navigator.geolocation.getCurrentPosition(
             async (position)=> {
                 checkWeather(position.coords);
+                setInterval(() => {
+                    checkWeather(position.coords);
+                }, 60000)
             }, 
             montrerErreursGeolocalisation,
             {
