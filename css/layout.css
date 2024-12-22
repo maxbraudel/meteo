@@ -37,7 +37,6 @@
     display: flex;
     gap: 10px;
     align-items: center;
-    /* prevent word wrap */
     white-space: nowrap;
     cursor: pointer;
 }
@@ -55,9 +54,7 @@
 
 
 #reset-position-btn:hover {
-    /* shadow around the button */
     box-shadow: 0 0 10px rgba(69, 61, 105, 0.2);
-
 }
 
 #desktop-menu {
@@ -223,6 +220,8 @@ footer{
     background: linear-gradient(180deg, rgba(247,247,247,1) 0%, rgba(255, 255, 255, 1) 100%);
     border-top: #EFEFEF solid 1px;
 }
+
+/* RESPONSIVE */
 
 @media (max-width: 768px) {
 

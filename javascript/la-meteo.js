@@ -24,7 +24,7 @@ async function checkWeather(coordonnees) {
             document.querySelector(".city").textContent = infosVille.ville; 
             document.querySelector(".temp").textContent = Math.round(data.main.temp) + "°C"; 
             document.querySelector(".hum").textContent = data.main.humidity + "%"; 
-            // document.querySelector(".couverture").innerHTML = data.clouds.all + "%";
+            document.querySelector(".couverture").innerHTML = data.clouds.all + "%";
 
             const weatherIconId = data.weather[0].icon;
 

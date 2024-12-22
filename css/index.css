@@ -12,8 +12,8 @@
 
 img{
     display: block;
-    pointer-events: none; /* Prevent interaction like dragging */
-    user-select: none; /* Prevent text selection for the image alt text */
+    pointer-events: none;
+    user-select: none;
     -webkit-user-drag: none;
 }
 
@@ -154,6 +154,8 @@ main #banner p {
     height: 40vh;
     object-fit: contain;
 }
+
+/* RESPONSIVE */
 
 @media (max-width: 768px) {
 
