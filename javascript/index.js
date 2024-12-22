@@ -1,18 +1,20 @@
-//Supprimer le filigrane
+// Supprimer le logo Spline du canvas
 
-const loopToRemoveWatermark = setInterval(() => {
-    
-    if (document.querySelector('spline-viewer')) {
+document.addEventListener('DOMContentLoaded', () => {
+    const loopToRemoveWatermark = setInterval(() => {
+        
+        if (document.querySelector('spline-viewer')) {
 
-        const customTag = document.querySelector('spline-viewer');
-        const shadowRoot = customTag.shadowRoot;
+            const customTag = document.querySelector('spline-viewer');
+            const shadowRoot = customTag.shadowRoot;
 
-        const logo = shadowRoot.querySelector('#logo');
-        if (logo) {
-            logo.remove();
-            clearInterval(loopToRemoveWatermark);
+            if (shadowRoot.querySelector('#logo')) {
+                const logo = shadowRoot.querySelector('#logo');
+                logo.remove();
+                clearInterval(loopToRemoveWatermark);
+            }
+
         }
 
-    }
-
-}, 1);
+    }, 1);
+})
