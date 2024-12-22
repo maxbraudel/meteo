@@ -9,9 +9,9 @@
 ## Choix d’architecture
 
 Notre site se divise en 3 pages 
-- index.html : explique le concept et redirige l’utilisateur vers les autres pages
-- la-météo.html : affiche les informations météo selon les coordonnées GSP de l’utilisateur
-- ma-ville.html : affiche un parcours personnalisé selon la ville et la météo
+- ```index.html``` : explique le concept et redirige l’utilisateur vers les autres pages
+- ```la-météo.html``` : affiche les informations météo selon les coordonnées GSP de l’utilisateur
+- ```ma-ville.html``` : affiche un parcours personnalisé selon la ville et la météo
 
 Nous avons utilisé HTML 5, CSS 3 ainsi que JavaScript. Pour chaque language, sont répertoriés les pages correspondantes. Il y a également un fichier global en js et css car certains éléments sont présents dans les 3 pages : header, footer et quelques fonctions pratiques
 
