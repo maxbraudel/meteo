@@ -23,12 +23,10 @@ main {
     justify-content: center;
     align-items: center;
     height: 100vh;
-}
-
-.meteo-section {
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
 }
+
 
 main h2 {
     font-size: 32px;
@@ -45,7 +43,6 @@ main h2 {
 #meteo-section-img img {
     max-width: 100%; 
     height: auto;
-    display: none;
 }
 
 
@@ -78,12 +75,16 @@ main h2 {
 
 
 .show {
-    display: block !important;
     opacity: 1;
 }
 
+.night-mode {
+    background-image: linear-gradient(to bottom, #202034, #1d1d30, #1a1b2b, #181827, #151623, #151623, #151623, #151623, #181827, #1a1b2b, #1d1d30, #202034);
+    color: rgb(255, 255, 255);
+}
+
 h1 {
-    color: rgb(189, 189, 189); 
+    color: rgb(189, 189, 189) !important; 
     font-size: 2.5rem; 
     margin-top: -20px;
 }

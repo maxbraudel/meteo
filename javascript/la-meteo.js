@@ -13,7 +13,7 @@ async function checkWeather(coordonnees) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const mainWrapper = document.querySelector('.meteo-section');
+        const mainWrapper = document.querySelector('main');
         
         const data = await response.json();
 
@@ -55,7 +55,7 @@ async function checkWeather(coordonnees) {
                 imageMeteo.setAttribute("src", "img/conditions/day/thunderstorm.svg")
                 document.querySelector("h1").textContent = "orage"
             } else if (weatherIconId === "50d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/scattered clouds.svg")
+                imageMeteo.setAttribute("src", "img/conditions/night/scattered clouds.svg")
                 document.querySelector("h1d").textContent = "brouillard"
             } if (weatherIconId === "01n" ){
                 imageMeteo.setAttribute("src", "img/conditions/night/clear sky.svg")
@@ -86,6 +86,11 @@ async function checkWeather(coordonnees) {
                 document.querySelector("h1d").textContent = "brouillard"
             } 
 
+            if (weatherIconId.includes("d") ){
+                document.querySelector("main").classList.add("night-mode")
+            } else {
+                document.querySelector("main").classList.remove("night-mode")
+            }
 
             // change favicon to the src of the element which
             const favicon = imageMeteo.src
