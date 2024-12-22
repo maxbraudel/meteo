@@ -197,7 +197,7 @@ async function envoyerRequeteApi(inputObject) {
     }, 20000)
 
     const alertFourthTimeOut = setTimeout(() => {
-        showAlert('🥵')
+        showAlert(`L'IA charge le modèle dans la RAM 🥵`)
     }, 25000)
 
     const localizationDatas = inputObject.localizationDatas
