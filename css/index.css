@@ -46,6 +46,10 @@ spline-viewer {
     display: none;
 }
 
+main {
+    margin-bottom: 10vw;
+}
+
 main #banner {
     display: flex;
     flex-direction: column;
