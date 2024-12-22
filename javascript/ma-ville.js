@@ -425,7 +425,7 @@ async function envoyerRequeteApi(inputObject) {
         clearTimeout(alertThirdTimeOut)
         clearTimeout(alertFourthTimeOut)
         await hideLoader()
-        reponseEl.innerHTML = "L'API Ollama est inacessible, veuillez réessayer plus tard.";
+        reponseEl.innerHTML = "L'API Ollama est inaccessible, veuillez réessayer plus tard.";
         testerUrlAPIEtReloadSiDisponible('https://ollama.maxbraudel.com/api/generate', 1000, response => response.body.getReader());
         reponseEl.classList.remove('justify-text');
         reponseEl.style.textAlign = 'center';
