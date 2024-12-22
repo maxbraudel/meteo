@@ -1,3 +1,5 @@
+// LOADERS ET ALERTES SUR LA PAGE
+
 function showAlert(message) {
     const alertEl = document.querySelector('.alert');
     const alertTextEl = alertEl.querySelector('p');
@@ -31,30 +33,72 @@ async function hideLoader() {
     await delay(500);
 }
 
-async function obtenirLocalisation() {
+// FONCTION POUR BOTENIR LES COORDONNEES GPS DEPUIS LE NAVIGATEUR
 
+// GPS NAVIGATEUR
+
+async function obtenirCoordonneesGps() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                // montrer un nouveau loader pendant la géolocalisation
-                montrerPosition(position);
-            }, 
-            montrerErreursGeolocalisation,
-            {
-                enableHighAccuracy: true,
-                timeout: 10000, 
-                maximumAge: 0
-            }
-        );
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // Résout avec les coordonnées GPS
+                    resolve(position);
+                },
+                (erreur) => {
+                    // Gestion des erreurs de géolocalisation
+                    montrerErreursGeolocalisation(erreur).then(() => {
+                        reject(erreur);
+                    });
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                }
+            );
+        });
     } else {
-        console.log("Votre navigateur n'est pas compatible avec la géolocalisation.")
-        await hideLoader()
-        const reponseEl = document.getElementById('reponse');
+        console.log("Votre navigateur n'est pas compatible avec la géolocalisation.");
+        await hideLoader();
+        const reponseEl = document.getElementById("reponse");
         reponseEl.textContent = "Votre navigateur n'est pas compatible avec la géolocalisation.";
+        return null;
     }
 }
 
-async function getWeatherByCoordinates(lat, lon) {
+async function montrerErreursGeolocalisation(erreur) {
+    const reponseEl = document.getElementById("reponse");
+    switch (erreur.code) {
+        case erreur.PERMISSION_DENIED:
+            await hideLoader();
+            reponseEl.textContent = "Vous devez autoriser la géolocalisation pour connaitre votre parcours.";
+            reponseEl.style.textAlign = "center";
+            break;
+        case erreur.POSITION_UNAVAILABLE:
+            await hideLoader();
+            reponseEl.textContent = "Votre navigateur ne peut pas vous donner l'information de votre position actuelle.";
+            reponseEl.style.textAlign = "center";
+            break;
+        case erreur.TIMEOUT:
+            await hideLoader();
+            reponseEl.textContent = "Le temps imparti pour obtenir votre position a expiré.";
+            reponseEl.style.textAlign = "center";
+            break;
+        case erreur.UNKNOWN_ERROR:
+            await hideLoader();
+            reponseEl.textContent = "Une erreur inconnue s'est produite.";
+            reponseEl.style.textAlign = "center";
+            break;
+    }
+}
+
+
+// API OPENWEATHERMAP
+
+async function obtenirDonneesMeteo(lat, lon) {
+
+    // Url de l'API openweathermap
     const apiKey = 'a27d442453213cecadd12d84e1c3fe77';
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
@@ -84,7 +128,11 @@ async function getWeatherByCoordinates(lat, lon) {
     })
 }
 
+
+// API BIGDATACLOUD
+
 async function obtenirVilleLaPlusProche(lat, lon) {
+
     // Url de l'API de Nominatim
     const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
     
@@ -125,63 +173,53 @@ async function obtenirVilleLaPlusProche(lat, lon) {
         testerUrlAPIEtReloadSiDisponible(url, 1000, response => response.ok);
 
 
-        return { ville: null, country: null, postCode: null, region: null };
+        return null;
     });
 }
 
-async function montrerPosition(position) {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
 
-    obtenirVilleLaPlusProche(latitude, longitude).then((localizationDatas) => {
-        if (localizationDatas.ville && localizationDatas.pays && localizationDatas.codePostal && localizationDatas.region) {
-            getWeatherByCoordinates(latitude, longitude).then((weathersDatas) => {
+// FONCTION D'INITIALISATION DU PARCOURS
 
-                if (weathersDatas) {
-                    const result = { localizationDatas, weathersDatas };
-                    envoyerRequeteApi(result);
-                }
+async function creerParcoursPersonnalise() {
 
-            })
+    // Obtenir les coordonnées GPS
+
+    const coordonnesGPS = await obtenirCoordonneesGps()
+
+    if (coordonnesGPS) {
+
+        // Obtenir les informations de la ville
+
+        const latitude = coordonnesGPS.coords.latitude;
+        const longitude = coordonnesGPS.coords.longitude;
+
+        const donneesVille = await obtenirVilleLaPlusProche(latitude, longitude)
+
+        if (donneesVille) {
+
+            // Obtenir les informations météorologiques
+            
+            const donneesMeteo = await obtenirDonneesMeteo(latitude, longitude)
+
+            if (donneesMeteo) {
+                const result = { donneesVille, donneesMeteo };
+
+                // Lancer la requête API de l'IA
+
+                envoyerRequeteIA(result);
+            }
+
         }
-    });
 
-}
-
-async function montrerErreursGeolocalisation(erreur) {
-    const reponseEl = document.getElementById('reponse');
-    // Handle error cases
-    switch (erreur.code) {
-        case erreur.PERMISSION_DENIED:
-            await hideLoader()
-            reponseEl.textContent = "Vous devez autoriser la géolocalisation pour connaitre votre parcours.";
-            reponseEl.style.textAlign = 'center';
-            break;
-        case erreur.POSITION_UNAVAILABLE:
-            await hideLoader()
-            reponseEl.textContent = "Votre navigateur ne peut pas vous donner l'information de votre position actuelle.";
-            reponseEl.style.textAlign = 'center';
-            break;
-        case erreur.TIMEOUT:
-            await hideLoader()
-            reponseEl.textContent = "Le temps imparti pour obtenir votre position a expiré.";
-            reponseEl.style.textAlign = 'center';
-            break;
-        case erreur.UNKNOWN_ERROR:
-            await hideLoader()
-            reponseEl.textContent = "Une erreur inconnue s'est produite.";
-            reponseEl.style.textAlign = 'center';
-            break;
     }
+
 }
 
-// si le dom est chargé on lance la géolocalisation
-document.addEventListener('DOMContentLoaded', () => {
-    showLoader(1)
-    obtenirLocalisation()
-})
+// API OLLAMA
 
-async function envoyerRequeteApi(inputObject) {
+async function envoyerRequeteIA(inputObject) {
+
+    const url = 'https://ollama.maxbraudel.com/api/generate';
 
     showLoader(2)
     const alertFirstTimeOut = setTimeout(() => {
@@ -200,20 +238,20 @@ async function envoyerRequeteApi(inputObject) {
         showAlert(`L'IA charge le modèle dans la RAM 🥵`)
     }, 25000)
 
-    const localizationDatas = inputObject.localizationDatas
-    const weathersDatas = inputObject.weathersDatas
+    const donneesVille = inputObject.donneesVille
+    const donneesMeteo = inputObject.donneesMeteo
 
     // convert all numbers to string with comma separator
-    weathersDatas.temperature = weathersDatas.temperature.toString().replace('.', ',')
-    weathersDatas.humidity = weathersDatas.humidity.toString().replace('.', ',')
-    weathersDatas.windSpeed = weathersDatas.windSpeed.toString().replace('.', ',')
+    donneesMeteo.temperature = donneesMeteo.temperature.toString().replace('.', ',')
+    donneesMeteo.humidity = donneesMeteo.humidity.toString().replace('.', ',')
+    donneesMeteo.windSpeed = donneesMeteo.windSpeed.toString().replace('.', ',')
 
     // const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}. (emojis)`;
     const message = `
-        Que peut-on faire dans la ville de ${localizationDatas.ville} et ses alentours ?.
+        Que peut-on faire dans la ville de ${donneesVille.ville} et ses alentours ?.
         Tu dois proposer un parcours adapté aux conditions météorologiques du jour.
-        Information météorologiques : température : ${weathersDatas.temperature}°C, humidité : ${weathersDatas.humidity}%, vent : ${weathersDatas.windSpeed}km/h.
-        Informations sur la ville : code postal : ${localizationDatas.codePostal}, région : ${localizationDatas.region}, pays : ${localizationDatas.pays}.
+        Information météorologiques : température : ${donneesMeteo.temperature}°C, humidité : ${donneesMeteo.humidity}%, vent : ${donneesMeteo.windSpeed}km/h.
+        Informations sur la ville : code postal : ${donneesVille.codePostal}, région : ${donneesVille.region}, pays : ${donneesVille.pays}.
         Commence à introduire la ville en une phrase et la météo du jour, puis rédige une liste ordonnée d'activités détaillées que l'on peut faire d'après les données météo, en lien avec des lieux connus propres à la ville ou à ses alentours..
         Utilise la virgule plutôt que le point pour marquer les décimales dans les chiffres.
         Exemple de notation interdite pour un nombre : 1.4
@@ -228,7 +266,7 @@ async function envoyerRequeteApi(inputObject) {
     const reponseBackEl = document.getElementById('reponse-back');
 
     try {
-        const reponse = await fetch('https://ollama.maxbraudel.com/api/generate', {
+        const reponse = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -246,12 +284,11 @@ async function envoyerRequeteApi(inputObject) {
         clearTimeout(alertThirdTimeOut)
         clearTimeout(alertFourthTimeOut)
         await hideLoader()
-        scrollToBottom();
+        scrollEnBas();
 
         // Streamer la réponse
         const reader = reponse.body.getReader();
         const decoder = new TextDecoder();
-        let reponseComplete = '';
 
         reponseEl.classList.add('justify-text');
 
@@ -259,10 +296,10 @@ async function envoyerRequeteApi(inputObject) {
             <img class="pointeur no-select" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">
         `
         function lierLesTiretsDansUnString(input) {
-            // Replace every hyphen "-" with a hyphen followed by the WORD JOINER "\u2060"
+            // Remplacer chaque tiret "-" par un tiret suivi du mot-joineur "\u2060"
             return input.replace(/-/g, '-\u2060');
         }
-        const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${lierLesTiretsDansUnString(localizationDatas.ville)}</div>${pointeurIconElement}`
+        const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${lierLesTiretsDansUnString(donneesVille.ville)}</div>${pointeurIconElement}`
 
         reponseEl.innerHTML = baseContent
         reponseBackEl.innerHTML = baseContent
@@ -309,7 +346,7 @@ async function envoyerRequeteApi(inputObject) {
 
             for (const line of lines) {
                 // Tester si l'utilisateur est au bas de la page
-                const isUserAtBottom = testIfUserIsAtBottom();
+                const isUserAtBottom = verfiierSiUtilisateurScrollEnBas();
 
                 try {
 
@@ -403,7 +440,7 @@ async function envoyerRequeteApi(inputObject) {
 
                 } finally {
                     if (isUserAtBottom) {
-                        scrollToBottom();
+                        scrollEnBas();
                     } else {
                         // stopper le mouvement de scroll en cours
                         window.scrollTo({
@@ -426,7 +463,7 @@ async function envoyerRequeteApi(inputObject) {
         clearTimeout(alertFourthTimeOut)
         await hideLoader()
         reponseEl.innerHTML = "L'API Ollama est inaccessible, veuillez réessayer plus tard.";
-        testerUrlAPIEtReloadSiDisponible('https://ollama.maxbraudel.com/api/generate', 1000, response => response.body.getReader());
+        testerUrlAPIEtReloadSiDisponible(url, 1000, response => response.body.getReader());
         reponseEl.classList.remove('justify-text');
         reponseEl.style.textAlign = 'center';
         reponseBackEl.innerHTML = "";
@@ -435,7 +472,7 @@ async function envoyerRequeteApi(inputObject) {
 
 let displayScrollTimeout
 
-function scrollToBottom() {
+function scrollEnBas() {
 
     // supprimer le timeout d'affichage de la scrollbar car elle doit encore être cachée
     clearTimeout(displayScrollTimeout);
@@ -453,7 +490,7 @@ function scrollToBottom() {
     }, 1000);
 }
 
-function testIfUserIsAtBottom() {
+function verfiierSiUtilisateurScrollEnBas() {
     // Tester si l'utilisateur est au bas de la page
     const scrollPosition = window.scrollY + window.innerHeight;
     // La valeur de threshold est calculée en fonction de la taille de la scrollbar
@@ -462,3 +499,11 @@ function testIfUserIsAtBottom() {
 
     return scrollPosition >= bottomPosition - threshold;
 }
+
+
+// INITILISATION DU PARCOURS APRES LE DOM CHARGÉ
+
+document.addEventListener('DOMContentLoaded', () => {
+    showLoader(1)
+    creerParcoursPersonnalise()
+})
