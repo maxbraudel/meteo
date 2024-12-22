@@ -12,8 +12,6 @@
     <title>Weather for you - La Météo</title>
 </head>
 <body>
-    
-
      <!-- Header -->
      <header>
         <div id="navBar">
@@ -23,7 +21,7 @@
                     <a class="logo-container" href="./index.html">
                         <img src="./img/favicon.png" height="40px" width="40px" alt="logo" class="no-select">
                     </a>
-                    <div aria-label="Rafraîchir la page" id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div>
+                    <div aria-label="Rafraîchir la page" id="reset-position-btn" onclick="location.reload()" class="btn">Rafraîchir les données</div>
                 </div>
                 <ul>
                     <li><a href="./index.html">Accueil</a></li>
@@ -39,7 +37,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Format mobile -->
         <div id="mobile-menu" aria-label="Navigation principale version mobile">
             <ul>
@@ -53,8 +50,6 @@
             </div>
         </div>
     </header>
-
-
     <main>
         <div class="loader no-select"></div>
         <div id="reponse" class=""></div>
@@ -63,14 +58,7 @@
             <h2 class="city">La ville</h2>
             <h1></h1>
             <div id="meteo-section-img">
-                <img id="broken-clouds" class="no-select" src="img/conditions/broken clouds.svg" alt="image d'un nuage brouillé">
-                <img id="clear-sky" class="no-select" src="img/conditions/clear sky.svg" alt="image d'un ciel clair">
-                <img id="few-clouds" class="no-select" src="img/conditions/few clouds.svg" alt="image d'un nuage peu intense">
-                <img id="rain" class="no-select" src="img/conditions/rain.svg" alt="image d'un pluie">
-                <img id="scattered-clouds" class="no-select" src="img/conditions/scattered clouds.svg" alt="image d'un nuage épars">
-                <img id="shower-rain" class="no-select" src="img/conditions/shower rain.svg" alt="image d'un nuage de pluie forte">
-                <img id="snow" class="no-select" src="img/conditions/snow.svg" alt="image d'un nuage de neige">
-                <img id="thunderstorm" class="no-select" src="img/conditions/thunderstorm.svg" alt="image d'un orage">
+                <img id="meteo-img" class="no-select" src="" alt="image condition météo" onload="this.classList.add('show')">
             </div>
 
             <div class="ranger">
@@ -87,11 +75,9 @@
             </div>
         </div>
     </main>
-
     <footer>
         <p>© 2024 Weather For You ⛅️ Tous droits réservés.</p>
     </footer>
-
     <script src="javascript/layout.js"></script>
     <script src="./javascript/layout.js"></script>
     <script src="./javascript/la-meteo.js"></script>

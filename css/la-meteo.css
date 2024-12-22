@@ -36,6 +36,7 @@ main h2 {
 }
 
 #meteo-section-img {
+    height: 318px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -53,6 +54,8 @@ main h2 {
     font-size: 1.7rem;
     font-weight: 500;
     max-width: 50vw;
+    position: absolute;
+    z-index: 999;
 }
 
 @media (max-width: 800px) {

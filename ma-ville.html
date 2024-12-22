@@ -12,7 +12,6 @@
     <title>Weather for you - Ma Ville</title>
 </head>
 <body>
-
      <!-- Header -->
      <header>
         <div id="navBar">
@@ -22,7 +21,7 @@
                     <a class="logo-container" href="./index.html">
                         <img src="./img/favicon.png" height="40px" width="40px" alt="logo" class="no-select">
                     </a>
-                    <div aria-label="Rafraîchir la page" id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div>
+                    <div aria-label="Rafraîchir la page" id="reset-position-btn" onclick="location.reload()" class="btn">Rafraîchir les données</div>
                 </div>
                 <ul>
                     <li><a href="./index.html">Accueil</a></li>
@@ -38,7 +37,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Format mobile -->
         <div id="mobile-menu" aria-label="Navigation principale version mobile">
             <ul>
@@ -52,9 +50,6 @@
             </div>
         </div>
     </header>
-
-
-
     <main>
         <div class="main-wrapper">
             <div class="reponse-wrapper">
@@ -67,11 +62,9 @@
             </div>
         </div>
     </main>
-
     <footer>
         <p>© 2024 Weather For You ⛅️ Tous droits réservés.</p>
     </footer>
-
     <script src="./javascript/layout.js"></script>
     <script src="./javascript/ma-ville.js"></script>
 </body>

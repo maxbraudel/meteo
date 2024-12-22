@@ -21,17 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 })
 
-function refreshLocalisation() {
-    localStorage.removeItem('position');
-    localStorage.removeItem('infosVille');
-}
-
-function refreshLocalisationAndReload() {
-    localStorage.removeItem('position');
-    localStorage.removeItem('infosVille');
-    location.reload();
-}
-
 /* FUNCTIONS */
 
 function delay(ms) {
