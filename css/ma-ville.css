@@ -1,7 +1,5 @@
 html, body {
     overflow-x: hidden;
-    margin: 0;
-    padding: 0;
     overflow-anchor: none; /* Empêcher les layout shifts */
 }
 
@@ -11,7 +9,6 @@ main {
     justify-content: center;
     align-items: center;
     position: relative;
-    
 }
 
 .main-wrapper {

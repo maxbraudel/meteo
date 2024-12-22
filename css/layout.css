@@ -226,3 +226,7 @@ ul li a {
 .logo-container {
     width: 45px;
 }
+
+.logo-container img {
+    display: block;
+}
