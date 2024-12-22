@@ -51,8 +51,8 @@ meteo/
 ## Choix sémantiques
 
 **Structure** :
-- Utilisation de balises structurantes : <header>, <nav>, <main>...
-- Diviser le corps du site en <section> pour réduire l’utilisation des <div>
+- Utilisation de balises structurantes : ```<header>```, ```<nav>```, ```<main>```...
+- Diviser le corps du site en ```<section>``` pour réduire l’utilisation des ```<div>```
 - Hiérarchie des titres respectée
 - Structure avec des ‘id’ pour les éléments uniques et des ‘class’ pour les éléments réutiliser
 - Code commenté pour ne pas s’y perdre !
