@@ -16,8 +16,6 @@ async function obtenirDonneesMeteo(lat, long) {
         
         const donneesMeteo = await response.json();
 
-        console.log('Données météorologiques :', donneesMeteo)
-
         return donneesMeteo;
     })
     .catch(async (erreur) => {
