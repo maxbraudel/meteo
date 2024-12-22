@@ -1,7 +1,8 @@
 # Compte Rendu
 #### Max Braudel - Lou Gardet - Marie Blanchard
 
-**weatherforyou.maxbraudel.com**
+**[weatherforyou.maxbraudel.com](https://weatherforyou.maxbraudel.com)**
+
 
 ☀️ “Weather for you” est un site où vous pouvez consulter la météo et avoir des propositions d’activités en fonction de votre localisation actuelle.
 
@@ -72,9 +73,8 @@ Nous avons implémenté des fallbacks intelligents pour chaque requête API :
 
 On fetch l’API -> l’API est indisponible -> on affichage un message d’erreur sur la page -> on fetch à nouveau l’API à intervalle régulier jusqu’à la réception d’une réponse positive (généralement response.ok) -> on reload la page lorsque l’API est de nouveau disponible
 
-Nous rendons le site accessible depuis un nom de domaine pour permettre au navigateur d’enregistrer les préférences de l’utilisateur en matière de localisation et ainsi éviter que la position GPS soit demandée à chaque fois.
-
-weatherforyou.maxbraudel.com
+Nous rendons le site accessible depuis un nom de domaine pour permettre au navigateur d’enregistrer les préférences de l’utilisateur en matière de localisation et ainsi éviter que la position GPS soit demandée à chaque fois :
+**[weatherforyou.maxbraudel.com](https://weatherforyou.maxbraudel.com)**
 
 ## Choix esthétiques
 
