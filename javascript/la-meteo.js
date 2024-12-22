@@ -1,8 +1,9 @@
 
 
-const apiKey = "54ab11de1bb7acd090d2f9fc9ac734cb ";
 
-async function checkWeather(result) {
+async function afficherMeteo(result) {
+
+    const apiKey = "54ab11de1bb7acd090d2f9fc9ac734cb ";
 
     const donneesVille = result.donneesVille
     const coordonnesGPS = result.coordonnesGPS.coords
@@ -112,6 +113,8 @@ async function checkWeather(result) {
 
 }
 
+// Fonction qui récupère les coordonnées GPS de l'utilisateur
+
 async function obtenirCoordonneesGps() {
     if (navigator.geolocation) {
         return new Promise((resolve, reject) => {
@@ -180,6 +183,8 @@ async function hideLoader() {
     loadingEl.classList.remove('loader-stage-2');
 }
 
+// Fonction qui récupère la ville la plus proche de l'utilisateur
+
 async function obtenirVilleLaPlusProche(lat, lon) {
 
     // Url de l'API de Nominatim
@@ -245,7 +250,7 @@ async function initialisationMeteo() {
 
             const result = { donneesVille, coordonnesGPS };
 
-            checkWeather(result);
+            afficherMeteo(result);
         }
     }
 }

@@ -67,7 +67,7 @@ meteo/
 Nous avons utilisés 3 APIs :
 - **OpenWeatherMap** : collecter des informations météo à partir de données GSP
 - **BigDataCloud** : collecter des informations sur la ville la plus proche à partir des données GSP
-- **Ollama** : communication avec une IA locale hébergée localement (llama3.2-vision) et récupération du flux de tokens générés en continu
+- **Ollama** : communication avec une IA locale hébergée localement dans un conteneur Docker (llama3.2-vision) et récupération du flux de tokens générés en continu
 
 Nous avons implémenté des fallbacks intelligents pour chaque requête API :
 

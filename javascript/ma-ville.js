@@ -1,5 +1,7 @@
 // LOADERS ET ALERTES SUR LA PAGE
 
+// fonction pour afficher des messages à acôté de l'animation de chargement
+
 function showAlert(message) {
     const alertEl = document.querySelector('.alert');
     const alertTextEl = alertEl.querySelector('p');
@@ -18,6 +20,8 @@ async function hideAlert() {
     await delay(500);
 }
 
+// fonction pour cacher le chargement (la fonction pour l'afficher est dans layout.js)
+
 async function hideLoader() {
 
     hideAlert()
@@ -33,7 +37,7 @@ async function hideLoader() {
     await delay(500);
 }
 
-// FONCTION POUR BOTENIR LES COORDONNEES GPS DEPUIS LE NAVIGATEUR
+// FONCTION POUR OBTENIR LES COORDONNEES GPS DEPUIS LE NAVIGATEUR
 
 // GPS NAVIGATEUR
 
@@ -221,6 +225,8 @@ async function envoyerRequeteIA(inputObject) {
 
     const url = 'https://ollama.maxbraudel.com/api/generate';
 
+    // Afficher des messages pendant le chargement
+
     showLoader(2)
     const alertFirstTimeOut = setTimeout(() => {
         showAlert('Génération de votre parcours')
@@ -241,12 +247,12 @@ async function envoyerRequeteIA(inputObject) {
     const donneesVille = inputObject.donneesVille
     const donneesMeteo = inputObject.donneesMeteo
 
-    // convert all numbers to string with comma separator
+    // Convertir tous les nombres avec séparateur de virgule (format francophone)
     donneesMeteo.temperature = donneesMeteo.temperature.toString().replace('.', ',')
     donneesMeteo.humidity = donneesMeteo.humidity.toString().replace('.', ',')
     donneesMeteo.windSpeed = donneesMeteo.windSpeed.toString().replace('.', ',')
 
-    // const message = `Que peut-on faire dans la ville de ${inputObject.ville} et ses alentours ? Voici quelques informations supplémentaire sur la ville : code postal : ${inputObject.codePostal}, région : ${inputObject.region}, pays : ${inputObject.pays}. (emojis)`;
+    // Template du prompt envoyé à l'IA
     const message = `
         Que peut-on faire dans la ville de ${donneesVille.ville} et ses alentours ?.
         Tu dois proposer un parcours adapté aux conditions météorologiques du jour.
@@ -262,7 +268,9 @@ async function envoyerRequeteIA(inputObject) {
         Exemple : 1. 🏃‍♂️ Jogger : {description détaillée}.
     `;
 
+    // Partie claire de la réponse
     const reponseEl = document.getElementById('reponse');
+    // Partie floutée et sombre de la réponse
     const reponseBackEl = document.getElementById('reponse-back');
 
     try {
@@ -279,6 +287,7 @@ async function envoyerRequeteIA(inputObject) {
             })
         });
 
+        // Supprimer les timeouts de messages
         clearTimeout(alertFirstTimeOut)
         clearTimeout(alertSecondTimeOut)
         clearTimeout(alertThirdTimeOut)
@@ -292,24 +301,21 @@ async function envoyerRequeteIA(inputObject) {
 
         reponseEl.classList.add('justify-text');
 
+        // Créer un pointeur à côté du dernier mot généré
         const pointeurIconElement = `
-            <img class="pointeur no-select" src="https://s3-alpha-sig.figma.com/img/cbae/6d24/89985c6fa0c99d2e33f7e705ad894935?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=qgKjsTz-mAcgYLXc70oB~eYmJxklVP1lZN98tcCvw326pgp4gtmnCUSJy68veYAXEWfSeiqDbDlQ69ps~NwHx69XIcb3zmu5mCM2oQX4f2BZjC1GJ3-MKo3dPClZe8gh8YGpx9Xhu6J6kC4gNcOylN3U5KF98ZubYWIJ0KXTCpQMZrvuAMwzUPOUsuFxYKLhu72uqLII3GSk95~TczKGfwIktjAHVTV653zKEE6uvvZ1WIeRFUnbc~f2dbJBYLKpLiRuFaJ2-qvC28HFtyNyBfHPOAsVBW8KWc4dt5z7MqEmhptqDzxlMv80Lpeb8~jIBt7z~QcwVRDbv0ww2lr~Ng__">
+            <img class="pointeur no-select" src="./img/pointeur.png">
         `
+
+        // Remplacer chaque tiret "-" par un tiret suivi du mot-joineur "\u2060" pour que le nom de la ville soit affiché en une fois
         function lierLesTiretsDansUnString(input) {
-            // Remplacer chaque tiret "-" par un tiret suivi du mot-joineur "\u2060"
             return input.replace(/-/g, '-\u2060');
         }
+
+        // Générer le début du contenu de la réponse
         const baseContent = `<div class="titre no-select">Quelques idées de parcours à ${lierLesTiretsDansUnString(donneesVille.ville)}</div>${pointeurIconElement}`
 
         reponseEl.innerHTML = baseContent
         reponseBackEl.innerHTML = baseContent
-
-        setTimeout(() => {
-            const allpointeurs = document.querySelectorAll('.pointeur')
-            allpointeurs.forEach(pointeur => {
-                pointeur.classList.add('pointeur-animation')
-            })
-        }, 1)
 
         let wordsArray = []
         let shadowWordsArray = []
@@ -318,12 +324,14 @@ async function envoyerRequeteIA(inputObject) {
 
             const allPointers = document.querySelectorAll('.pointeur')
 
+            // Ajouter l'animation d'apparition aux pointeurs (celui sur la partie claire et celui sur la partie floutée)
             allPointers.forEach(pointeur => {
                 if (!pointeur.classList.contains('pointeur-animation')) {
                     pointeur.classList.add('pointeur-animation')
                 }
             })
 
+            // Lorsque la génération de la réponse est terminée, supprimer les pointeurs
             const { done, value } = await reader.read();
             if (done) {
                 
@@ -339,8 +347,6 @@ async function envoyerRequeteIA(inputObject) {
                 break;
             }
 
-            document.querySelector('.pointeur').classList.add('pointeur-animation');
-
             const chunk = decoder.decode(value);
             const lines = chunk.split('\n').filter(line => line.trim() !== '');
 
@@ -349,7 +355,6 @@ async function envoyerRequeteIA(inputObject) {
                 const isUserAtBottom = verfiierSiUtilisateurScrollEnBas();
 
                 try {
-
                     const parsedLine = JSON.parse(line);
                     if (parsedLine.response) {
 
@@ -359,29 +364,25 @@ async function envoyerRequeteIA(inputObject) {
 
                         let newWord = parsedLine.response;
 
+                        // Supprimer le caractère * s'il est présent dans un token (l'IA a tendence a générer du contenu markdown mais je ne le prends pas en compte)
+
                         newWord = newWord.replace(/\*/g, '')
+
+                        // On supprime les indications de sexe des tokens qui contiennent des emojis
 
                         if (newWord === '♂' || newWord === '♀') {
                             newWord = '';
                         }
 
-                        function containsEmoji(text) {
-                            const emojiRegex = /^(?:[\u2700-\u27bf]|(?:[\ud83c\udde6-\ud83c\uddff]){2}|[\ud800\udc00-\udbff\udfff]|[\u2600-\u26FF\u2700-\u27BF]|(?:[\ud83d\udc00-\ud83d\ude4f]|[\ud83d\ude80-\ud83d\udeff]|[\u2600-\u26ff]|[\u2700-\u27bf]|\ud83c[\udde0-\ud83c\uddff])+)$/u;
-                            
-                            return emojiRegex.test(text.trim());
-                        }
-
-
-                        // if the new word is a dot and the last word is a number add a br before
+                        // Si le nouveau mot est un point et que le dernier mot est un nombre, ajouter un retour à la ligne avant (pour afficher de belles listes)
                         if (wordsArray && wordsArray.length > 0 && newWord === '.') {
 
                             const lastWordElement = wordsArray[wordsArray.length - 1];
                             const lastLastLastWordElement = wordsArray[wordsArray.length - 3] || null;
-
                             const lastShadowWordElement = shadowWordsArray[shadowWordsArray.length - 1];
 
                             if (lastWordElement.textContent.match(/^\d/) && (lastLastLastWordElement === null || !lastLastLastWordElement.textContent.match(/^\d/))) {
-                                // add a br before last word element
+                                // ajouter une balise br avant le dernier mot
                                 const br = document.createElement('br');
                                 const span = document.createElement('span');
                                 span.classList.add('indent');
@@ -405,15 +406,20 @@ async function envoyerRequeteIA(inputObject) {
                         newSpan.innerHTML = newWord;
                         newShadowSpan.innerHTML = newWord;
 
-                        
-
+                        // Ajouter le nouveau mot au contenu de la réponse (sur la partie claire et sur la partie floutée)
                         reponseEl.insertBefore(newSpan, reponseEl.querySelector('.pointeur'))
                         reponseBackEl.insertBefore(newShadowSpan, reponseBackEl.querySelector('.pointeur'))
 
 
-                        if (containsEmoji(newWord) === true) {
-                            // log the coordinates of reponseEl
+                        // FONCTION POUR DÉTECTER LES EMOJIS
+                        function containsEmoji(text) {
+                            const emojiRegex = /^(?:[\u2700-\u27bf]|(?:[\ud83c\udde6-\ud83c\uddff]){2}|[\ud800\udc00-\udbff\udfff]|[\u2600-\u26FF\u2700-\u27BF]|(?:[\ud83d\udc00-\ud83d\ude4f]|[\ud83d\ude80-\ud83d\udeff]|[\u2600-\u26ff]|[\u2700-\u27bf]|\ud83c[\udde0-\ud83c\uddff])+)$/u;
+                            
+                            return emojiRegex.test(text.trim());
+                        }
 
+                        if (containsEmoji(newWord) === true) {
+                            // Afficher un gros emoji flouté à côté de l'emoji existant sur le paragraphe clair
                             const bigEmojiElement = document.createElement('span');
                             bigEmojiElement.textContent = newWord;
                             bigEmojiElement.classList.add('big-emoji');
@@ -424,6 +430,7 @@ async function envoyerRequeteIA(inputObject) {
                             newSpan.appendChild(bigEmojiElement);
                         }
 
+                        // Ajouter l'animation d'apparition aux nouveaux mots
                         setTimeout(() => {
                             const allWords = document.querySelectorAll('.word')
                             allWords.forEach(word => {
@@ -432,8 +439,12 @@ async function envoyerRequeteIA(inputObject) {
                         }, 1)
                     }
                 } catch (parseError) {
+
+                    // Il se peut que le token ne soit pas valide, donc on affiche une erreur sur la page 
+                    // mais ça ne pose pas de problème, le génération peut continuer
                     console.error('Erreur lors du fetch du token IA:', parseError);
-                                            
+                    
+                    // On cache le pointer (il sera réafficher quand le prochain token valide sera généré)
                     allPointers.forEach(pointeur => {
                         pointeur.classList.remove('pointeur-animation')    
                     })
@@ -470,6 +481,8 @@ async function envoyerRequeteIA(inputObject) {
     }
 }
 
+// FONCTIONS DE SCROLL AUTO
+
 let displayScrollTimeout
 
 function scrollEnBas() {
@@ -499,7 +512,6 @@ function verfiierSiUtilisateurScrollEnBas() {
 
     return scrollPosition >= bottomPosition - threshold;
 }
-
 
 // INITILISATION DU PARCOURS APRES LE DOM CHARGÉ
 
