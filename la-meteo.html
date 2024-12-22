@@ -12,14 +12,18 @@
     <title>Weather for you - La Météo</title>
 </head>
 <body>
-    <header>
+    
+
+     <!-- Header -->
+     <header>
         <div id="navBar">
-            <nav id="desktop-menu">
-                <div>
+            <!-- Format desktop -->
+            <nav id="desktop-menu" aria-label="Navigation principale">
+                <div id="left-nav">
                     <a class="logo-container" href="./index.html">
                         <img src="./img/favicon.png" height="40px" width="40px" alt="logo" class="no-select">
-                    </a>                    
-                    <div id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div>
+                    </a>
+                    <div aria-label="Rafraîchir la page" id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div>
                 </div>
                 <ul>
                     <li><a href="./index.html">Accueil</a></li>
@@ -27,25 +31,30 @@
                     <li><a href="./ma-ville.html">Ma ville</a></li>
                 </ul>
             </nav>
+
             <div id="desktop-bar">
-                <a href="./index.html"><img src="./img/favicon.png" height="40px" alt="logo" class="no-select"></a>
-                <div id="mobile-menu-btn">
+                <img src="./img/favicon.png" height="40px" alt="logo" class="no-select">
+                <div aria-label="Ouvrir le menu mobile" id="mobile-menu-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-justify"><path d="M3 12h18"/><path d="M3 18h18"/><path d="M3 6h18"/></svg>
                 </div>
             </div>
         </div>
-        <div id="mobile-menu">
+
+        <!-- Format mobile -->
+        <div id="mobile-menu" aria-label="Navigation principale version mobile">
             <ul>
                 <li><a href="./index.html">Accueil</a></li>
                 <li><a href="./la-meteo.html">La météo</a></li>
                 <li><a href="./ma-ville.html">Ma ville</a></li>
-                <li><div id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div></li>
+                <li><div aria-label="Rafraîchir la page" id="reset-position-btn" onclick="refreshLocalisationAndReload()" class="btn">Rafraîchir ma position</div></li>
             </ul>
             <div id="return">
                 <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </div>
         </div>
     </header>
+
+
     <main>
         <div class="loader no-select"></div>
         <div id="reponse" class=""></div>
@@ -78,6 +87,11 @@
             </div>
         </div>
     </main>
+
+    <footer>
+        <p>© 2024 Weather For You ⛅️ Tous droits réservés.</p>
+    </footer>
+
     <script src="javascript/layout.js"></script>
     <script src="./javascript/layout.js"></script>
     <script src="./javascript/la-meteo.js"></script>

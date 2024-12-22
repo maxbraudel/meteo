@@ -30,6 +30,22 @@ h2{
     font-size: calc(1rem + 2vw);
 }
 
+spline-viewer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    animation: fadeInSimple 1.5s ease-in forwards;
+    animation-delay: 1s;
+    opacity: 0;
+}
+
+#logo {
+    display: none;
+}
+
 main #banner {
     display: flex;
     flex-direction: column;

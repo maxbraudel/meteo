@@ -144,23 +144,6 @@ ul li a {
     width: 100%;
 }
 
-@media (max-width: 768px) {
-
-    #navBar{
-        padding: 1.4rem 1rem;
-        background: transparent;
-        border-bottom: 0px;
-    }
-
-    #desktop-menu {
-        display: none;
-    }
-
-    #desktop-bar, #mobile-menu-btn {
-        display: flex;
-    }
-}
-
 
 /* LOADER ELEMENTS */
 
@@ -229,4 +212,37 @@ ul li a {
 
 .logo-container img {
     display: block;
+}
+
+footer{
+    height:5vh;
+    background: rgb(247,247,247);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+
+    #navBar{
+        padding: 1.4rem 1rem;
+        background: transparent;
+        border-bottom: 0px;
+    }
+
+    #desktop-menu {
+        display: none;
+    }
+
+    #desktop-bar, #mobile-menu-btn {
+        display: flex;
+    }
+
+    footer{
+        height:15vh;
+    }
+
+    footer p {
+        padding: 0 2rem;
+    }
 }
