@@ -127,6 +127,7 @@ async function obtenirDonneesMeteo(lat, lon) {
         reponseEl.style.textAlign = 'center';
         reponseEl.textContent = "L'API météo est indisponible.";
 
+        return null;
     })
 }
 

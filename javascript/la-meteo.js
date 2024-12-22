@@ -18,19 +18,17 @@ async function obtenirDonneesMeteo(lat, long) {
 
         console.log('Données météorologiques :', donneesMeteo)
 
-        if (donneesMeteo) {
-            return donneesMeteo;
-        } else {
-            throw new Error('Données météorologiques non trouvées');
-        }
+        return donneesMeteo;
     })
     .catch(async (erreur) => {
+        document.querySelector('.meteo-section').remove();
+        document.querySelector('main').classList.add('show');
         console.error('Erreur lors de la récupération de la météo:', erreur);
         hideLoader()
         const reponseEl = document.getElementById('reponse');
         reponseEl.textContent = "L'API météo est indisponible.";
         testerUrlAPIEtReloadSiDisponible(apiUrl, 1000, response => response.ok);
-
+        return null;
     })
 }
 
