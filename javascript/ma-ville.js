@@ -196,6 +196,10 @@ async function envoyerRequeteApi(inputObject) {
         showAlert('Encore un peu de patience 😢')
     }, 20000)
 
+    const alertFourthTimeOut = setTimeout(() => {
+        showAlert('🥵')
+    }, 25000)
+
     const localizationDatas = inputObject.localizationDatas
     const weathersDatas = inputObject.weathersDatas
 
@@ -240,6 +244,7 @@ async function envoyerRequeteApi(inputObject) {
         clearTimeout(alertFirstTimeOut)
         clearTimeout(alertSecondTimeOut)
         clearTimeout(alertThirdTimeOut)
+        clearTimeout(alertFourthTimeOut)
         await hideLoader()
         scrollToBottom();
 
@@ -418,6 +423,7 @@ async function envoyerRequeteApi(inputObject) {
         clearTimeout(alertFirstTimeOut)
         clearTimeout(alertSecondTimeOut)
         clearTimeout(alertThirdTimeOut)
+        clearTimeout(alertFourthTimeOut)
         await hideLoader()
         reponseEl.innerHTML = "L'API Ollama est inacessible, veuillez réessayer plus tard.";
         testerUrlAPIEtReloadSiDisponible('https://ollama.maxbraudel.com/api/generate', 1000, response => response.body.getReader());
