@@ -86,7 +86,7 @@ async function checkWeather(coordonnees) {
                 document.querySelector("h1d").textContent = "brouillard"
             } 
 
-            if (weatherIconId.includes("d") ){
+            if (weatherIconId.includes("n") ){
                 document.querySelector("main").classList.add("night-mode")
             } else {
                 document.querySelector("main").classList.remove("night-mode")
