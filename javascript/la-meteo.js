@@ -2,9 +2,12 @@
 
 const apiKey = "54ab11de1bb7acd090d2f9fc9ac734cb ";
 
-async function checkWeather(coordonnees) {
+async function checkWeather(result) {
 
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${coordonnees.latitude}&lon=${coordonnees.longitude}&appid=${apiKey}`;
+    const donneesVille = result.donneesVille
+    const coordonnesGPS = result.coordonnesGPS.coords
+
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${coordonnesGPS.latitude}&lon=${coordonnesGPS.longitude}&appid=${apiKey}`;
 
     return fetch(apiUrl)
     .then(async (response) => {
@@ -12,16 +15,13 @@ async function checkWeather(coordonnees) {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
-        const mainWrapper = document.querySelector('main');
         
         const data = await response.json();
 
-        const infosVille = await obtenirVilleLaPlusProche(coordonnees.latitude, coordonnees.longitude);
 
-        if (infosVille.ville !== null) {
+        if (donneesVille.ville !== null) {
 
-            document.querySelector(".city").textContent = infosVille.ville; 
+            document.querySelector(".city").textContent = donneesVille.ville; 
             document.querySelector(".temp").textContent = Math.round(data.main.temp) + "°C"; 
             document.querySelector(".hum").textContent = data.main.humidity + "%"; 
             document.querySelector(".couverture").innerHTML = data.clouds.all + "%";
@@ -97,7 +97,7 @@ async function checkWeather(coordonnees) {
             document.querySelector('link[rel="icon"]').href = favicon
 
             hideLoader()
-            mainWrapper.classList.add('show');
+            document.querySelector('main').classList.add('show');
         
         }
     
@@ -112,35 +112,42 @@ async function checkWeather(coordonnees) {
 
 }
 
-async function obtenirLocalisation() {
-    showLoader(1)
+async function obtenirCoordonneesGps() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            async (position)=> {
-                checkWeather(position.coords);
-                setInterval(() => {
-                    checkWeather(position.coords);
-                }, 60000)
-            }, 
-            montrerErreursGeolocalisation,
-            {
-                enableHighAccuracy: true,
-                timeout: 10000, 
-                maximumAge: 0
-            }
-        );
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // Résout avec les coordonnées GPS
+                    resolve(position);
+                },
+                (erreur) => {
+                    // Gestion des erreurs de géolocalisation
+                    montrerErreursGeolocalisation(erreur).then(() => {
+                        reject(erreur);
+                    });
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                }
+            );
+        });
     } else {
         console.log("Votre navigateur n'est pas compatible avec la géolocalisation.")
+        document.querySelector('.meteo-section').remove();
+        document.querySelector('main').classList.add('show');
         hideLoader()
         const reponseEl = document.getElementById('reponse');
         reponseEl.textContent = "Votre navigateur n'est pas compatible avec la géolocalisation.";
+        return null;
     }
 }
 
-obtenirLocalisation()
-
 async function montrerErreursGeolocalisation(erreur) {
     const reponseEl = document.getElementById('reponse');
+    document.querySelector('.meteo-section').remove();
+    document.querySelector('main').classList.add('show');
     // Handle error cases
     switch (erreur.code) {
         case erreur.PERMISSION_DENIED:
@@ -174,13 +181,16 @@ async function hideLoader() {
 }
 
 async function obtenirVilleLaPlusProche(lat, lon) {
-// Url de l'API de Nominatim
+
+    // Url de l'API de Nominatim
     const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`;
+    
     return fetch(url)
     .then((reponse) => {
         if (!reponse.ok) {
-            throw new Error('Erreur réseau');
+            throw new Error(reponse.statusText);
         }
+
         return reponse.json();
         })
         .then((donnes) => {
@@ -190,7 +200,7 @@ async function obtenirVilleLaPlusProche(lat, lon) {
         const region = donnes.principalSubdivision
         const pays = donnes.countryName 
 
-        const infosVille = {
+        const donneesVille = {
             ville: ville,
             pays: pays,
             codePostal: codePostal,
@@ -198,14 +208,50 @@ async function obtenirVilleLaPlusProche(lat, lon) {
         };
 
         // Retourner les informations de la ville
-        return infosVille;
+        return donneesVille;
     })
-    .catch((erreur) => {
+    .catch(async (erreur) => {
+
         console.error('Erreur lors de la récupération de la ville:', erreur);
-        hideLoader()
+
+        document.querySelector('.meteo-section').remove();
+        document.querySelector('main').classList.add('show');
+
         const reponseEl = document.getElementById('reponse');
+        await hideLoader()
+        reponseEl.style.textAlign = 'center';
         reponseEl.textContent = "L'API de géolocalisation n'a pas pu trouver votre ville.";
+
         testerUrlAPIEtReloadSiDisponible(url, 1000, response => response.ok);
-    return { ville: null, country: null, postCode: null, region: null };
+
+
+        return null;
     });
 }
+
+// INITILISATION DE LA METEO
+
+async function initialisationMeteo() {
+    showLoader(1)
+    const coordonnesGPS = await obtenirCoordonneesGps()
+
+    console.log(coordonnesGPS)
+
+    if (coordonnesGPS) {
+
+        const donneesVille = await obtenirVilleLaPlusProche(coordonnesGPS.latitude, coordonnesGPS.longitude);
+
+        if (donneesVille) {
+
+            const result = { donneesVille, coordonnesGPS };
+
+            checkWeather(result);
+        }
+    }
+}
+
+// INITILISATION DE LA METEO APRES LE DOM CHARGÉ
+
+document.addEventListener('DOMContentLoaded', () => {
+    initialisationMeteo()
+})
