@@ -1,119 +1,40 @@
 
+// FETCH API OPENWEATHERMAP (pour obtenir les informations météorologiques)
 
-
-async function afficherMeteo(result) {
-
+async function obtenirDonneesMeteo(lat, long) {
+    
     const apiKey = "54ab11de1bb7acd090d2f9fc9ac734cb ";
 
-    const donneesVille = result.donneesVille
-    const coordonnesGPS = result.coordonnesGPS.coords
-
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${coordonnesGPS.latitude}&lon=${coordonnesGPS.longitude}&appid=${apiKey}`;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${lat}&lon=${long}&appid=${apiKey}`;
 
     return fetch(apiUrl)
     .then(async (response) => {
         
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`Erreur fetch: ${response.status}`);
         }
         
-        const data = await response.json();
+        const donneesMeteo = await response.json();
 
+        console.log('Données météorologiques :', donneesMeteo)
 
-        if (donneesVille.ville !== null) {
-
-            document.querySelector(".city").textContent = donneesVille.ville; 
-            document.querySelector(".temp").textContent = Math.round(data.main.temp) + "°C"; 
-            document.querySelector(".hum").textContent = data.main.humidity + "%"; 
-            document.querySelector(".couverture").innerHTML = data.clouds.all + "%";
-
-            const weatherIconId = data.weather[0].icon;
-
-            const imageMeteo = document.querySelector("#meteo-img")
-
-            if (weatherIconId === "01d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/clear sky.svg")
-                document.querySelector("h1").textContent = "ensoleillé"
-            } else if (weatherIconId === "02d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/few clouds.svg")
-                document.querySelector("h1").textContent = "partiellement nuageux"
-            } else if (weatherIconId === "03d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/broken clouds.svg")
-                document.querySelector("h1").textContent = "couvert"
-            } else if (weatherIconId === "04d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/scattered clouds.svg")
-                document.querySelector("h1").textContent = "nuageux"
-            } else if (weatherIconId === "09d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/shower rain.svg")
-                document.querySelector("h1").textContent = "pluie abondante"
-            } else if (weatherIconId === "10d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/rain.svg")
-                document.querySelector("h1").textContent = "pluie"
-            } else if (weatherIconId === "11d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/snow.svg")
-                document.querySelector("h1").textContent = "neige"
-            } else if (weatherIconId === "13d") {
-                imageMeteo.setAttribute("src", "img/conditions/day/thunderstorm.svg")
-                document.querySelector("h1").textContent = "orage"
-            } else if (weatherIconId === "50d") {
-                imageMeteo.setAttribute("src", "img/conditions/night/scattered clouds.svg")
-                document.querySelector("h1d").textContent = "brouillard"
-            } if (weatherIconId === "01n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/clear sky.svg")
-                document.querySelector("h1").textContent = "ensoleillé"
-            } else if (weatherIconId === "02n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/few clouds.svg")
-                document.querySelector("h1").textContent = "partiellement nuageux"
-            } else if (weatherIconId === "03n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/broken clouds.svg")
-                document.querySelector("h1").textContent = "couvert"
-            } else if (weatherIconId === "04n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/scattered clouds.svg")
-                document.querySelector("h1").textContent = "nuageux"
-            } else if (weatherIconId === "09n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/shower rain.svg")
-                document.querySelector("h1").textContent = "pluie abondante"
-            } else if (weatherIconId === "10n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/rain.svg")
-                document.querySelector("h1").textContent = "pluie"
-            } else if (weatherIconId === "11n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/snow.svg")
-                document.querySelector("h1").textContent = "neige"
-            } else if (weatherIconId === "13n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/thunderstorm.svg")
-                document.querySelector("h1").textContent = "orage"
-            } else if (weatherIconId === "50n" ){
-                imageMeteo.setAttribute("src", "img/conditions/night/scattered clouds.svg")
-                document.querySelector("h1d").textContent = "brouillard"
-            } 
-
-            if (weatherIconId.includes("n") ){
-                document.querySelector("main").classList.add("night-mode")
-            } else {
-                document.querySelector("main").classList.remove("night-mode")
-            }
-
-            // change favicon to the src of the element which
-            const favicon = imageMeteo.src
-            document.querySelector('link[rel="icon"]').href = favicon
-
-            hideLoader()
-            document.querySelector('main').classList.add('show');
-        
+        if (donneesMeteo) {
+            return donneesMeteo;
+        } else {
+            throw new Error('Données météorologiques non trouvées');
         }
-    
     })
-    .catch (error => {
-        console.error('Erreur lors de la récupération de la météo:', error);
+    .catch(async (erreur) => {
+        console.error('Erreur lors de la récupération de la météo:', erreur);
         hideLoader()
         const reponseEl = document.getElementById('reponse');
         reponseEl.textContent = "L'API météo est indisponible.";
         testerUrlAPIEtReloadSiDisponible(apiUrl, 1000, response => response.ok);
-    })
 
+    })
 }
 
-// Fonction qui récupère les coordonnées GPS de l'utilisateur
+// RECUPERER LES COORDONNÉES GPS
 
 async function obtenirCoordonneesGps() {
     if (navigator.geolocation) {
@@ -176,6 +97,8 @@ async function montrerErreursGeolocalisation(erreur) {
     }
 }
 
+// CACHER LE LOADER (la fonction pour l'afficher est dans layout.js)
+
 async function hideLoader() {
     const loadingEl = document.querySelector('.loader');
     loadingEl.classList.remove('show-loader');
@@ -183,7 +106,7 @@ async function hideLoader() {
     loadingEl.classList.remove('loader-stage-2');
 }
 
-// Fonction qui récupère la ville la plus proche de l'utilisateur
+// FETCH API BIGDATACLOUD (pour obtenir les informations de la ville la plus proche)
 
 async function obtenirVilleLaPlusProche(lat, lon) {
 
@@ -234,23 +157,125 @@ async function obtenirVilleLaPlusProche(lat, lon) {
     });
 }
 
+// AFFICHER LES INFORMATIONS MÉTÉOROLOGIQUES
+
+async function afficherMeteo(result) {
+
+    const donneesVille = result.donneesVille
+    const donneesMeteo = result.donneesMeteo
+
+    document.querySelector(".city").textContent = donneesVille.ville; 
+    document.querySelector(".temp").textContent = Math.round(donneesMeteo.main.temp) + "°C"; 
+    document.querySelector(".hum").textContent = donneesMeteo.main.humidity + "%"; 
+    document.querySelector(".couverture").innerHTML = donneesMeteo.clouds.all + "%";
+
+    const weatherIconId = donneesMeteo.weather[0].icon;
+
+    const imageMeteo = document.querySelector("#meteo-img")
+
+    if (weatherIconId === "01d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/clear sky.svg")
+        document.querySelector("h1").textContent = "ensoleillé"
+    } else if (weatherIconId === "02d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/few clouds.svg")
+        document.querySelector("h1").textContent = "partiellement nuageux"
+    } else if (weatherIconId === "03d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/broken clouds.svg")
+        document.querySelector("h1").textContent = "couvert"
+    } else if (weatherIconId === "04d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/scattered clouds.svg")
+        document.querySelector("h1").textContent = "nuageux"
+    } else if (weatherIconId === "09d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/shower rain.svg")
+        document.querySelector("h1").textContent = "pluie abondante"
+    } else if (weatherIconId === "10d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/rain.svg")
+        document.querySelector("h1").textContent = "pluie"
+    } else if (weatherIconId === "11d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/snow.svg")
+        document.querySelector("h1").textContent = "neige"
+    } else if (weatherIconId === "13d") {
+        imageMeteo.setAttribute("src", "img/conditions/day/thunderstorm.svg")
+        document.querySelector("h1").textContent = "orage"
+    } else if (weatherIconId === "50d") {
+        imageMeteo.setAttribute("src", "img/conditions/night/scattered clouds.svg")
+        document.querySelector("h1d").textContent = "brouillard"
+    } if (weatherIconId === "01n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/clear sky.svg")
+        document.querySelector("h1").textContent = "ensoleillé"
+    } else if (weatherIconId === "02n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/few clouds.svg")
+        document.querySelector("h1").textContent = "partiellement nuageux"
+    } else if (weatherIconId === "03n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/broken clouds.svg")
+        document.querySelector("h1").textContent = "couvert"
+    } else if (weatherIconId === "04n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/scattered clouds.svg")
+        document.querySelector("h1").textContent = "nuageux"
+    } else if (weatherIconId === "09n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/shower rain.svg")
+        document.querySelector("h1").textContent = "pluie abondante"
+    } else if (weatherIconId === "10n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/rain.svg")
+        document.querySelector("h1").textContent = "pluie"
+    } else if (weatherIconId === "11n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/snow.svg")
+        document.querySelector("h1").textContent = "neige"
+    } else if (weatherIconId === "13n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/thunderstorm.svg")
+        document.querySelector("h1").textContent = "orage"
+    } else if (weatherIconId === "50n" ){
+        imageMeteo.setAttribute("src", "img/conditions/night/scattered clouds.svg")
+        document.querySelector("h1d").textContent = "brouillard"
+    } 
+
+    if (weatherIconId.includes("n") ){
+        document.querySelector("main").classList.add("night-mode")
+    } else {
+        document.querySelector("main").classList.remove("night-mode")
+    }
+
+    // change favicon to the src of the element which
+    const favicon = imageMeteo.src
+    document.querySelector('link[rel="icon"]').href = favicon
+
+    hideLoader()
+    document.querySelector('main').classList.add('show');
+
+}
+
 // INITILISATION DE LA METEO
 
 async function initialisationMeteo() {
+
     showLoader(1)
+
+    // Obtenir les coordonnées GPS
+
     const coordonnesGPS = await obtenirCoordonneesGps()
 
-    console.log(coordonnesGPS)
+    console.log('Coordonnées GPS :', coordonnesGPS)
 
     if (coordonnesGPS) {
 
+        // Obtenir les informations de la ville
+
         const donneesVille = await obtenirVilleLaPlusProche(coordonnesGPS.latitude, coordonnesGPS.longitude);
+
+        console.log('Informations de la ville :', donneesVille)
 
         if (donneesVille) {
 
-            const result = { donneesVille, coordonnesGPS };
+            const donneesMeteo = await obtenirDonneesMeteo(coordonnesGPS.coords.latitude, coordonnesGPS.coords.longitude);
 
-            afficherMeteo(result);
+            console.log('Données météorologiques :', donneesMeteo)
+
+            if (donneesMeteo) {
+
+                const result = { donneesVille, donneesMeteo };
+                afficherMeteo(result);
+
+            }
         }
     }
 }

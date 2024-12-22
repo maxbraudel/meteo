@@ -1,4 +1,5 @@
 //Supprimer le filigrane
+
 const loopToRemoveWatermark = setInterval(() => {
     
     if (document.querySelector('spline-viewer')) {

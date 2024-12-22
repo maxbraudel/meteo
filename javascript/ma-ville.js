@@ -1,6 +1,6 @@
 // LOADERS ET ALERTES SUR LA PAGE
 
-// fonction pour afficher des messages à acôté de l'animation de chargement
+// AFFICHER DES MESSAGES À ACÔTÉ DE L'ANIMATION DE CHARGEMENT
 
 function showAlert(message) {
     const alertEl = document.querySelector('.alert');
@@ -20,7 +20,7 @@ async function hideAlert() {
     await delay(500);
 }
 
-// fonction pour cacher le chargement (la fonction pour l'afficher est dans layout.js)
+// CACHER LE LOADER (la fonction pour l'afficher est dans layout.js)
 
 async function hideLoader() {
 
@@ -37,9 +37,7 @@ async function hideLoader() {
     await delay(500);
 }
 
-// FONCTION POUR OBTENIR LES COORDONNEES GPS DEPUIS LE NAVIGATEUR
-
-// GPS NAVIGATEUR
+// OBTENIR LES COORDONNEES GPS DEPUIS LE NAVIGATEUR
 
 async function obtenirCoordonneesGps() {
     if (navigator.geolocation) {
@@ -98,7 +96,7 @@ async function montrerErreursGeolocalisation(erreur) {
 }
 
 
-// API OPENWEATHERMAP
+// FETCH API OPENWEATHERMAP (pour obtenir les informations météorologiques)
 
 async function obtenirDonneesMeteo(lat, lon) {
 
@@ -133,7 +131,7 @@ async function obtenirDonneesMeteo(lat, lon) {
 }
 
 
-// API BIGDATACLOUD
+// FETCH API BIGDATACLOUD (pour obtenir les informations de la ville la plus proche)
 
 async function obtenirVilleLaPlusProche(lat, lon) {
 
@@ -181,45 +179,7 @@ async function obtenirVilleLaPlusProche(lat, lon) {
     });
 }
 
-
-// FONCTION D'INITIALISATION DU PARCOURS
-
-async function creerParcoursPersonnalise() {
-
-    // Obtenir les coordonnées GPS
-
-    const coordonnesGPS = await obtenirCoordonneesGps()
-
-    if (coordonnesGPS) {
-
-        // Obtenir les informations de la ville
-
-        const latitude = coordonnesGPS.coords.latitude;
-        const longitude = coordonnesGPS.coords.longitude;
-
-        const donneesVille = await obtenirVilleLaPlusProche(latitude, longitude)
-
-        if (donneesVille) {
-
-            // Obtenir les informations météorologiques
-            
-            const donneesMeteo = await obtenirDonneesMeteo(latitude, longitude)
-
-            if (donneesMeteo) {
-                const result = { donneesVille, donneesMeteo };
-
-                // Lancer la requête API de l'IA
-
-                envoyerRequeteIA(result);
-            }
-
-        }
-
-    }
-
-}
-
-// API OLLAMA
+// FETCH API OLLAMA (pour générer le parcours personnalisé)
 
 async function envoyerRequeteIA(inputObject) {
 
@@ -513,9 +473,55 @@ function verfiierSiUtilisateurScrollEnBas() {
     return scrollPosition >= bottomPosition - threshold;
 }
 
+
+
+// FONCTION D'INITIALISATION DU PARCOURS
+
+async function creerParcoursPersonnalise() {
+
+    showLoader(1)
+    
+    // Obtenir les coordonnées GPS
+
+    const coordonnesGPS = await obtenirCoordonneesGps()
+
+    console.log('Coordonnées GPS :', coordonnesGPS)
+
+    if (coordonnesGPS) {
+
+        // Obtenir les informations de la ville
+
+        const latitude = coordonnesGPS.coords.latitude;
+        const longitude = coordonnesGPS.coords.longitude;
+
+        const donneesVille = await obtenirVilleLaPlusProche(latitude, longitude)
+
+        console.log('Informations de la ville :', donneesVille)
+
+        if (donneesVille) {
+
+            // Obtenir les informations météorologiques
+            
+            const donneesMeteo = await obtenirDonneesMeteo(latitude, longitude)
+
+            console.log('Données météorologiques :', donneesMeteo)
+
+            if (donneesMeteo) {
+                const result = { donneesVille, donneesMeteo };
+
+                // Lancer la requête API de l'IA
+
+                envoyerRequeteIA(result);
+            }
+
+        }
+
+    }
+
+}
+
 // INITILISATION DU PARCOURS APRES LE DOM CHARGÉ
 
 document.addEventListener('DOMContentLoaded', () => {
-    showLoader(1)
     creerParcoursPersonnalise()
 })
