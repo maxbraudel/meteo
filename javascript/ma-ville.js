@@ -184,11 +184,17 @@ document.addEventListener('DOMContentLoaded', () => {
 async function envoyerRequeteApi(inputObject) {
 
     showLoader(2)
-    showAlert('Génération de votre parcours')
+    const alertFirstTimeOut = setTimeout(() => {
+        showAlert('Génération de votre parcours')
+    }, 3000)
 
-    const alertTimeOut = setTimeout(() => {
+    const alertSecondTimeOut = setTimeout(() => {
         showAlert('Cela peut prendre un moment')
     }, 10000)
+
+    const alertThirdTimeOut = setTimeout(() => {
+        showAlert('Encore un peu de patience 😢')
+    }, 20000)
 
     const localizationDatas = inputObject.localizationDatas
     const weathersDatas = inputObject.weathersDatas
@@ -231,7 +237,9 @@ async function envoyerRequeteApi(inputObject) {
             })
         });
 
-        clearTimeout(alertTimeOut)
+        clearTimeout(alertFirstTimeOut)
+        clearTimeout(alertSecondTimeOut)
+        clearTimeout(alertThirdTimeOut)
         await hideLoader()
         scrollToBottom();
 
@@ -407,7 +415,9 @@ async function envoyerRequeteApi(inputObject) {
         }
     } catch (erreur) {
         console.error('Erreur lors du fetch:', erreur);
-        clearTimeout(alertTimeOut)
+        clearTimeout(alertFirstTimeOut)
+        clearTimeout(alertSecondTimeOut)
+        clearTimeout(alertThirdTimeOut)
         await hideLoader()
         reponseEl.innerHTML = "L'API Ollama est inacessible, veuillez réessayer plus tard.";
         testerUrlAPIEtReloadSiDisponible('https://ollama.maxbraudel.com/api/generate', 1000, response => response.body.getReader());
