@@ -23,6 +23,7 @@ main {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    min-height: 750px;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
 }
