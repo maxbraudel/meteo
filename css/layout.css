@@ -190,7 +190,7 @@ ul li a {
 }
 
 .loader {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -240,7 +240,7 @@ footer{
     }
 
     footer{
-        height:15vh;
+        height:7vh;
     }
 
     footer p {

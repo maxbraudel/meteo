@@ -78,9 +78,13 @@ h1 {
     margin-top: -20px;
 }
 
+.meteo-section {
+    margin-top: 6rem;
+}
+
 /* RESPONSIVE */
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
 
     #reponse {
         font-size: 1.5rem;
@@ -88,6 +92,10 @@ h1 {
 
     h1 {
         font-size: 2rem;
+    }
+
+    .meteo-section {
+        margin-top: 0
     }
 
 }
