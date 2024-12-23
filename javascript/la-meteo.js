@@ -228,9 +228,11 @@ async function afficherMeteo(result) {
     if (weatherIconId.includes("n") ){
         document.querySelector("main").classList.add("night-mode")
         document.getElementById("mobile-menu-btn").style.color = "#fff"
+        document.getElementById("mobile-menu").style.backgroundColor = "#fff"
     } else {
         document.querySelector("main").classList.remove("night-mode")
-        document.getElementById("mobile-menu-btn").style.color = "#000"
+        document.getElementById("mobile-menu-btn").style.removeProperty("color")
+        document.getElementById("mobile-menu").style.removeProperty("background-color")
     }
 
     // change favicon to the src of the element which
