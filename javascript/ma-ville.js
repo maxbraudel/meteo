@@ -144,7 +144,6 @@ async function obtenirVilleLaPlusProche(lat, lon) {
         if (!reponse.ok) {
             throw new Error(reponse.statusText);
         }
-
         return reponse.json();
         })
         .then((donnes) => {

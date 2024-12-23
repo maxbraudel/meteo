@@ -114,10 +114,11 @@ async function obtenirVilleLaPlusProche(lat, lon) {
         if (!reponse.ok) {
             throw new Error(reponse.statusText);
         }
-
         return reponse.json();
+
         })
         .then((donnes) => {
+
         // Recup les informations de la ville
         const ville = donnes.city
         const codePostal = donnes.postcode
@@ -260,7 +261,10 @@ async function initialisationMeteo() {
 
         // Obtenir les informations de la ville
 
-        const donneesVille = await obtenirVilleLaPlusProche(coordonnesGPS.latitude, coordonnesGPS.longitude);
+        const latitude = coordonnesGPS.coords.latitude;
+        const longitude = coordonnesGPS.coords.longitude;
+
+        const donneesVille = await obtenirVilleLaPlusProche(latitude, longitude);
 
         console.log('Informations de la ville :', donneesVille)
 
